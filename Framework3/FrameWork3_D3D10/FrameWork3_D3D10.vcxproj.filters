@@ -1,0 +1,336 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\Audio\al.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\alc.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\alut.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\Audio.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\codec.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\ogg.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\os_types.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Audio\vorbisfile.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Direct3D\D3DApp.h">
+      <Filter>Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Direct3D\Direct3DRenderer.h">
+      <Filter>Direct3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Direct3D10\D3D10App.h">
+      <Filter>Direct3D10</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Direct3D10\Direct3D10Renderer.h">
+      <Filter>Direct3D10</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Direct3D11\D3D11App.h">
+      <Filter>Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Direct3D11\Direct3D11Renderer.h">
+      <Filter>Direct3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\Button.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\CheckBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\Dialog.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\DropDownList.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\Label.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\Slider.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GUI\Widget.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\Image.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\jconfig.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\jmorecfg.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\jpeglib.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\old\jconfig.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\old\jmorecfg.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\old\jpeglib.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\png.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\pngconf.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\zconf.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Imaging\zlib.h">
+      <Filter>Imaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Frustum.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\MathTools.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\MyMath.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Noise.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Reorder.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Scissor.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\SIMD.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\SphericalHarmonics.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Vector.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenGL\OpenGLApp.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenGL\OpenGLExtensions.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenGL\OpenGLRenderer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\Array.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\BSP.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\ConvexHull.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\Hash.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\KdTree.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\Model.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\Queue.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\String.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\TexturePacker.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\Thread.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Util\Tokenizer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Windows\resource.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\BaseApp.h" />
+    <ClInclude Include="..\Config.h" />
+    <ClInclude Include="..\CPU.h" />
+    <ClInclude Include="..\Platform.h" />
+    <ClInclude Include="..\Renderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{1c7a361f-81f7-433a-a019-fc5cb0c8f329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct3D">
+      <UniqueIdentifier>{ac308d14-8fba-494d-b9b2-b547c4a9bbc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct3D10">
+      <UniqueIdentifier>{73b450bc-d4a6-46f7-8b8b-b1f1e15ebb8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct3D11">
+      <UniqueIdentifier>{84d4b4e4-0cd7-4e6a-8ad4-ac9396d9d9dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{a234238b-7156-4f6f-bdde-58d456822160}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imaging">
+      <UniqueIdentifier>{4b3ee01a-3fae-48fc-ae61-380768da21cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Linux">
+      <UniqueIdentifier>{38c33d3d-77f8-4130-9362-c86a7130bb38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mac">
+      <UniqueIdentifier>{698a26fd-30c3-44dd-8fb2-e72d1e309660}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{4437609c-f037-498e-8159-79b61a6d871b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OpenGL">
+      <UniqueIdentifier>{98d8f38e-a40b-425f-afd8-92a07e7fa2c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{8a171b2d-b7a9-4e56-ac83-8994fc8ada9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{480763cc-a8bc-48d5-9a16-430ecf2de3bb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Audio\Audio.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Direct3D\D3DApp.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Direct3D\Direct3DRenderer.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Direct3D10\D3D10App.cpp">
+      <Filter>Direct3D10</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Direct3D10\Direct3D10Renderer.cpp">
+      <Filter>Direct3D10</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Direct3D11\D3D11App.cpp">
+      <Filter>Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Direct3D11\Direct3D11Renderer.cpp">
+      <Filter>Direct3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\Button.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\CheckBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\Dialog.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\DropDownList.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\Label.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\Slider.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GUI\Widget.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Imaging\Image.cpp">
+      <Filter>Imaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Linux\LinuxBase.cpp">
+      <Filter>Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Mac\MacBase.cpp">
+      <Filter>Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Frustum.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\MathTools.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Noise.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Reorder.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Scissor.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\SIMD.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\SphericalHarmonics.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Vector.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenGL\OpenGLApp.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenGL\OpenGLExtensions.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenGL\OpenGLRenderer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\BSP.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\ConvexHull.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\Model.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\String.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\TexturePacker.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\Thread.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Util\Tokenizer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Windows\WindowsBase.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\BaseApp.cpp" />
+    <ClCompile Include="..\Config.cpp" />
+    <ClCompile Include="..\CPU.cpp" />
+    <ClCompile Include="..\Platform.cpp" />
+    <ClCompile Include="..\Renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Windows\Resources.rc">
+      <Filter>Windows</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="Ambient.shd">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="CreateMask.shd">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="FillBuffers.shd">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="Lighting.shd">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{9f8cffbc-a091-40b5-ac9b-17338fecd7ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+  </ItemGroup>
+</Project>
