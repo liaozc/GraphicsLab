@@ -207,7 +207,7 @@ bool D3D10App::initAPI(const DXGI_FORMAT backBufferFmt, const DXGI_FORMAT depthB
 
 	DWORD deviceFlags = D3D10_CREATE_DEVICE_SINGLETHREADED;
 #ifdef _DEBUG
-    deviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+  //  deviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
 #ifdef USE_D3D10_1
@@ -259,7 +259,7 @@ bool D3D10App::initAPI(const DXGI_FORMAT backBufferFmt, const DXGI_FORMAT depthB
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("./Fonts/Future.dds", "./Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);

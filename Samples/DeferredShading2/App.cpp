@@ -73,8 +73,6 @@ void App::onSize(const int w, const int h){
 
 bool App::init(){
 
-	SetCurrentDirectoryA("");
-
 	// No framework created depth buffer
 	depthBits = 0;
 	
@@ -157,12 +155,12 @@ bool App::load(){
 	sprintf(def, "#define SAMPLE_COUNT %d\n", sampleCount);
 
 	// Shaders
-	if ((fillBuffers = renderer->addShader("FillBuffers.shd")) == SHADER_NONE) return false;
-	if ((ambient     = renderer->addShader("Ambient.shd", def)) == SHADER_NONE) return false;
-	if ((createMask  = renderer->addShader("CreateMask.shd")) == SHADER_NONE) return false;
-	if ((lighting[0] = renderer->addShader("Lighting.shd", def)) == SHADER_NONE) return false;
+	if ((fillBuffers = renderer->addShader(ResDir"/FillBuffers.shd")) == SHADER_NONE) return false;
+	if ((ambient     = renderer->addShader(ResDir"/Ambient.shd", def)) == SHADER_NONE) return false;
+	if ((createMask  = renderer->addShader(ResDir"/CreateMask.shd")) == SHADER_NONE) return false;
+	if ((lighting[0] = renderer->addShader(ResDir"/Lighting.shd", def)) == SHADER_NONE) return false;
 	strcat(def, "#define SINGLE_SAMPLE\n");
-	if ((lighting[1] = renderer->addShader("Lighting.shd", def)) == SHADER_NONE) return false;
+	if ((lighting[1] = renderer->addShader(ResDir"/Lighting.shd", def)) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((trilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;

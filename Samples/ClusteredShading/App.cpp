@@ -85,8 +85,6 @@ void App::onSize(const int w, const int h)
 bool App::init()
 {
 
-	
-
 	// No framework created depth buffer
 	depthBits = 0;
 
