@@ -25,7 +25,7 @@
 #include "codec.h"
 #include "vorbisfile.h"
 
-#ifdef _WIN32
+#ifdef NO_WIN32
 #  pragma comment (lib, "../Framework3/Libs/OpenAL32.lib")
 #  pragma comment (lib, "../Framework3/Libs/alut.lib")
 #  pragma comment (lib, "../Framework3/Libs/ogg_static.lib")

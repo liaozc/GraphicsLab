@@ -69,7 +69,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Framework3\;$(SolutionDir)\Framework3\Audio;$(SolutionDir)\Framework3\Debug;$(SolutionDir)\Framework3\Direct3D10;$(SolutionDir)\Framework3\GUI;$(SolutionDir)\Framework3\Imaging;$(SolutionDir)\Framework3\Math;$(SolutionDir)\Framework3\Util;$(SolutionDir)\Framework3\Windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Framework3\;$(SolutionDir)\Framework3\Audio;$(SolutionDir)\Framework3\Debug;$(SolutionDir)\Framework3\Direct3D10;$(SolutionDir)\Framework3\GUI;$(SolutionDir)\Framework3\Imaging;$(SolutionDir)\Framework3\Windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(ProjectName)_d.exe</OutputFile>
@@ -78,6 +78,8 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(OutDir)FrameWork3_D3D10.lib;OpenAL32.lib;alut.lib;ogg_static.lib;vorbis_static.lib;vorbisfile_static.lib;libpng.lib;zlib.lib;libjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)FrameWork3\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,6 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

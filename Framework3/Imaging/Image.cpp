@@ -31,14 +31,14 @@
 extern "C" {
 #include "jpeglib.h"
 }
-#ifdef _WIN32
+#ifdef NO_WIN32
 #pragma comment (lib, "../Framework3/Libs/libjpeg.lib")
 #endif // _WIN32
 #endif // NO_JPEG
 
 #ifndef NO_PNG
 #include "png.h"
-#ifdef _WIN32
+#ifdef NO_WIN32
 #pragma comment (lib, "../Framework3/Libs/libpng.lib")
 #pragma comment (lib, "../Framework3/Libs/zlib.lib")
 #endif // _WIN32

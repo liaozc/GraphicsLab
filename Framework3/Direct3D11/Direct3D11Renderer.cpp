@@ -151,7 +151,6 @@ struct RasterizerState
 	ID3D11RasterizerState *rsState;
 };
 
-//@liao<2017/4/12>:modified for compiler
 // Blending constants
 const int ZERO                = D3D11_BLEND_ZERO;
 const int ONE                 = D3D11_BLEND_ONE;

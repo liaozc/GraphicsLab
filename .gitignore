@@ -8,6 +8,7 @@
 *.opendb
 *.db
 *.ipch
+*.manifest
 
 # Precompiled Headers
 *.gch

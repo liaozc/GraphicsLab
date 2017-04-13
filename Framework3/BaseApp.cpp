@@ -109,6 +109,7 @@ void BaseApp::loadConfig(){
 void BaseApp::initGUI(){
 	const float w = 430;
 	const float h = 350;
+	int address = (int)&(((BaseApp*)0)->configDialog);
 	configDialog = new Dialog(0.5f * (width - w), 0.5f * (height - h), w, h, false, true);
 	configDialog->setVisible(false);
 	int tab = configDialog->addTab("Options");

@@ -8,6 +8,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FrameWork3_D3D11", "Framework3\FrameWork3_D3D11\FrameWork3_D3D11.vcxproj", "{32F05FA0-1707-4B88-8483-8D1B75BB6AE5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeferredShading2", "Samples\DeferredShading2\DeferredShading2.vcxproj", "{7E51D1A8-9228-4D96-9AB6-2C821A653542}"
+	ProjectSection(ProjectDependencies) = postProject
+		{224EB325-62BC-429F-BCBD-64533087859B} = {224EB325-62BC-429F-BCBD-64533087859B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClusteredShading", "Samples\ClusteredShading\ClusteredShading.vcxproj", "{1AA0AA22-C405-4766-8700-0D74F649AC83}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +47,14 @@ Global
 		{7E51D1A8-9228-4D96-9AB6-2C821A653542}.Release|x64.ActiveCfg = Release|Win32
 		{7E51D1A8-9228-4D96-9AB6-2C821A653542}.Release|x86.ActiveCfg = Release|Win32
 		{7E51D1A8-9228-4D96-9AB6-2C821A653542}.Release|x86.Build.0 = Release|Win32
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Debug|x64.ActiveCfg = Debug|x64
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Debug|x64.Build.0 = Debug|x64
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Debug|x86.ActiveCfg = Debug|Win32
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Debug|x86.Build.0 = Debug|Win32
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Release|x64.ActiveCfg = Release|x64
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Release|x64.Build.0 = Release|x64
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Release|x86.ActiveCfg = Release|Win32
+		{1AA0AA22-C405-4766-8700-0D74F649AC83}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
