@@ -259,7 +259,7 @@ bool D3D10App::initAPI(const DXGI_FORMAT backBufferFmt, const DXGI_FORMAT depthB
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("./Fonts/Future.dds", "./Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../Media/Fonts/Future.dds", "../Media/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);

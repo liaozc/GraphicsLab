@@ -239,7 +239,7 @@ bool OpenGLApp::initAPI(){
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../Media/Fonts/Future.dds", "../Media/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);
@@ -407,7 +407,7 @@ bool OpenGLApp::initAPI(){
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../Media/Fonts/Future.dds", "../Media/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);
@@ -607,7 +607,7 @@ bool OpenGLApp::initAPI(){
 	antiAlias->selectItem(antiAliasSamples / 2);
 
 	linearClamp = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
-	defaultFont = renderer->addFont("../Textures/Fonts/Future.dds", "../Textures/Fonts/Future.font", linearClamp);
+	defaultFont = renderer->addFont("../Media/Fonts/Future.dds", "../Media/Fonts/Future.font", linearClamp);
 	blendSrcAlpha = renderer->addBlendState(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
 	noDepthTest  = renderer->addDepthState(false, false);
 	noDepthWrite = renderer->addDepthState(true,  false);
