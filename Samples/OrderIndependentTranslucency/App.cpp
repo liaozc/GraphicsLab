@@ -1,7 +1,7 @@
 #include "App.h"
 
-#define ResDir	"E:/GraphicsLab/Samples/OrderIndependentTranslucency"
-
+#define LocalDir	"/Samples/OrderIndependentTranslucency"
+#include "InitResDir.inl"
 
 BaseApp *app = new App();
 
@@ -25,9 +25,10 @@ void App::onSize(const int w, const int h){
 }
 
 bool App::init(){
+	initWorkDir();
 	// Load the geometry
 	model = new Model();
-	if (!model->loadObj(ResDir"/Models/Horse.obj")){
+	if (!model->loadObj(ResDir("/Models/Horse.obj"))){
 		ErrorMsg("Couldn't load model file");
 		return false;
 	}
@@ -53,9 +54,9 @@ void App::exitAPI(){
 
 bool App::load(){
 	// Shaders
-	if ((render = renderer->addShader(ResDir"/render.shd")) == SHADER_NONE) return false;
-	if ((sort = renderer->addShader(ResDir"/sort.shd")) == SHADER_NONE) return false;
-	if ((stencilClear = renderer->addShader(ResDir"/stencilClear.shd")) == SHADER_NONE) return false;
+	if ((render = renderer->addShader(ResDir("/render.shd"))) == SHADER_NONE) return false;
+	if ((sort = renderer->addShader(ResDir("/sort.shd"))) == SHADER_NONE) return false;
+	if ((stencilClear = renderer->addShader(ResDir("/stencilClear.shd"))) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((trilinearClamp = renderer->addSamplerState(TRILINEAR, CLAMP, CLAMP, CLAMP)) == SS_NONE) return false;
@@ -69,12 +70,12 @@ bool App::load(){
 
 	// Skybox
 	const char *fileNames[] = {
-		ResDir"/Textures/CubeMaps/UnionSquare/posx.jpg",
-		ResDir"/Textures/CubeMaps/UnionSquare/negx.jpg",
-		ResDir"/Textures/CubeMaps/UnionSquare/posy.jpg",
-		ResDir"/Textures/CubeMaps/UnionSquare/negy.jpg",
-		ResDir"/Textures/CubeMaps/UnionSquare/posz.jpg",
-		ResDir"/Textures/CubeMaps/UnionSquare/negz.jpg",
+		ResDir("/Textures/CubeMaps/UnionSquare/posx.jpg"),
+		ResDir("/Textures/CubeMaps/UnionSquare/negx.jpg"),
+		ResDir("/Textures/CubeMaps/UnionSquare/posy.jpg"),
+		ResDir("/Textures/CubeMaps/UnionSquare/negy.jpg"),
+		ResDir("/Textures/CubeMaps/UnionSquare/posz.jpg"),
+		ResDir("/Textures/CubeMaps/UnionSquare/negz.jpg"),
 	};
 	if ((env = renderer->addCubemap(fileNames, true, trilinearClamp)) == TEXTURE_NONE) return false;
 	

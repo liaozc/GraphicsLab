@@ -2,8 +2,8 @@
 #include "App.h"
 
 
-#define ResDir	"E:/GraphicsLab/Samples/DeferredShading"
-
+#define LocalDir	"//Samples/DeferredShading"
+#include "InitResDir.inl"
 
 BaseApp *app = new App();
 
@@ -43,6 +43,8 @@ void App::onSize(const int w, const int h){
 }
 
 bool App::init(){
+	initWorkDir();
+
 	initNoise();
 	pause = false;
 
@@ -72,12 +74,12 @@ void App::exitAPI(){
 
 bool App::load(){
 	// Shaders
-	if ((fillBuffers = renderer->addShader(ResDir"/fillBuffers.shd")) == SHADER_NONE) return false;
-	if ((ambient     = renderer->addShader(ResDir"/ambient.shd"    )) == SHADER_NONE) return false;
-	if ((lighting    = renderer->addShader(ResDir"/lighting.shd"   )) == SHADER_NONE) return false;
-	if ((particles   = renderer->addShader(ResDir"/particles.shd"  )) == SHADER_NONE) return false;
-	if ((initParticles   = renderer->addShader(ResDir"/initParticles.shd"  )) == SHADER_NONE) return false;
-	if ((particlePhysics = renderer->addShader(ResDir"/particlePhysics.shd")) == SHADER_NONE) return false;
+	if ((fillBuffers = renderer->addShader(ResDir("/fillBuffers.shd"))) == SHADER_NONE) return false;
+	if ((ambient     = renderer->addShader(ResDir("/ambient.shd")    )) == SHADER_NONE) return false;
+	if ((lighting    = renderer->addShader(ResDir("/lighting.shd")   )) == SHADER_NONE) return false;
+	if ((particles   = renderer->addShader(ResDir("/particles.shd")  )) == SHADER_NONE) return false;
+	if ((initParticles   = renderer->addShader(ResDir("/initParticles.shd")  )) == SHADER_NONE) return false;
+	if ((particlePhysics = renderer->addShader(ResDir("/particlePhysics.shd"))) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((trilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;
@@ -100,15 +102,15 @@ bool App::load(){
 
 
 	// Textures
-	if ((base[0] = renderer->addTexture  (ResDir"/Textures/FieldStone.dds",                     true, trilinearAniso)) == SHADER_NONE) return false;
-	if ((bump[0] = renderer->addNormalMap(ResDir"/Textures/FieldStoneBump.dds",   FORMAT_RGBA8, true, trilinearAniso)) == SHADER_NONE) return false;
-	if ((base[1] = renderer->addTexture  (ResDir"/Textures/stone08.dds",                        true, trilinearAniso)) == SHADER_NONE) return false;
-	if ((bump[1] = renderer->addNormalMap(ResDir"/Textures/stone08Bump.dds",      FORMAT_RGBA8, true, trilinearAniso)) == SHADER_NONE) return false;
-	if ((base[2] = renderer->addTexture  (ResDir"/Textures/floor_wood_3.dds",                   true, trilinearAniso)) == SHADER_NONE) return false;
-	if ((bump[2] = renderer->addNormalMap(ResDir"/Textures/floor_wood_3Bump.dds", FORMAT_RGBA8, true, trilinearAniso)) == SHADER_NONE) return false;
+	if ((base[0] = renderer->addTexture  (ResDir("/Textures/FieldStone.dds"),                     true, trilinearAniso)) == SHADER_NONE) return false;
+	if ((bump[0] = renderer->addNormalMap(ResDir("/Textures/FieldStoneBump.dds"),   FORMAT_RGBA8, true, trilinearAniso)) == SHADER_NONE) return false;
+	if ((base[1] = renderer->addTexture  (ResDir("/Textures/stone08.dds"),                        true, trilinearAniso)) == SHADER_NONE) return false;
+	if ((bump[1] = renderer->addNormalMap(ResDir("/Textures/stone08Bump.dds"),      FORMAT_RGBA8, true, trilinearAniso)) == SHADER_NONE) return false;
+	if ((base[2] = renderer->addTexture  (ResDir("/Textures/floor_wood_3.dds"),                   true, trilinearAniso)) == SHADER_NONE) return false;
+	if ((bump[2] = renderer->addNormalMap(ResDir("/Textures/floor_wood_3Bump.dds"), FORMAT_RGBA8, true, trilinearAniso)) == SHADER_NONE) return false;
 
-	if ((particle = renderer->addTexture(ResDir"/Textures/Particle.tga", true, trilinearClamp)) == SHADER_NONE) return false;
-	if ((particleColors = renderer->addTexture(ResDir"/Textures/SparkColors.dds", false, linearClamp)) == SHADER_NONE) return false;
+	if ((particle = renderer->addTexture(ResDir("/Textures/Particle.tga"), true, trilinearClamp)) == SHADER_NONE) return false;
+	if ((particleColors = renderer->addTexture(ResDir("/Textures/SparkColors.dds"), false, linearClamp)) == SHADER_NONE) return false;
 
 
 

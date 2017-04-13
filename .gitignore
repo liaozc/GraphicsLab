@@ -9,6 +9,9 @@
 *.db
 *.ipch
 *.manifest
+*.suo
+*.log
+*.pdb
 
 # Precompiled Headers
 *.gch
@@ -34,4 +37,5 @@
 *.out
 *.app
 
+Debug
 

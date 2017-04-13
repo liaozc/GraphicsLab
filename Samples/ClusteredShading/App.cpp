@@ -25,7 +25,10 @@ const uint CLUSTER_X = 32;
 const uint CLUSTER_Y = 8;
 const uint CLUSTER_Z = 32;
 
-#define ResDir	"E:/GraphicsLab/Samples/ClusteredShading"
+
+#define LocalDir	"/Samples/ClusteredShading"
+#include "InitResDir.inl"
+
 
 BaseApp *app = new App();
 
@@ -84,11 +87,11 @@ void App::onSize(const int w, const int h)
 
 bool App::init()
 {
-
+	initWorkDir();
 	// No framework created depth buffer
 	depthBits = 0;
 
-	if (!m_Map.loadObj(ResDir"/Models/Corridor2/Map.obj")) return false;
+	if (!m_Map.loadObj((g_workDir + "/Models/Corridor2/Map.obj").c_str())) return false;
 	m_Map.scale(0, float3(1, 1, -1));
 
 	uint nIndices = m_Map.getIndexCount();
@@ -196,18 +199,18 @@ bool App::load()
 	sprintf(def, "#define SAMPLE_COUNT %d\n", sampleCount);
 
 	// Shaders
-	if ((m_Clustered    = renderer->addShader(ResDir"/Clustered.shd", DEFINE_STR(LIGHT_COUNT))) == SHADER_NONE) return false;
-	if ((m_ShowClusters = renderer->addShader(ResDir"/Clustered.shd", DEFINE_STR(LIGHT_COUNT) "#define SHOW_CLUSTERS\n")) == SHADER_NONE) return false;
-	if ((m_PreZ         = renderer->addShader(ResDir"/PreZ.shd")) == SHADER_NONE) return false;
-	if ((m_FillBuffers  = renderer->addShader(ResDir"/FillBuffers.shd")) == SHADER_NONE) return false;
-	if ((m_CreateMask   = renderer->addShader(ResDir"/CreateMask.shd")) == SHADER_NONE) return false;
-	if ((m_Ambient[0]   = renderer->addShader(ResDir"/Ambient.shd", def)) == SHADER_NONE) return false;
-	if ((m_Lighting[0]  = renderer->addShader(ResDir"/Lighting.shd", def)) == SHADER_NONE) return false;
+	if ((m_Clustered    = renderer->addShader(ResDir("/Clustered.shd"), DEFINE_STR(LIGHT_COUNT))) == SHADER_NONE) return false;
+	if ((m_ShowClusters = renderer->addShader(ResDir("/Clustered.shd"), DEFINE_STR(LIGHT_COUNT) "#define SHOW_CLUSTERS\n")) == SHADER_NONE) return false;
+	if ((m_PreZ         = renderer->addShader(ResDir("/PreZ.shd"))) == SHADER_NONE) return false;
+	if ((m_FillBuffers  = renderer->addShader(ResDir("/FillBuffers.shd"))) == SHADER_NONE) return false;
+	if ((m_CreateMask   = renderer->addShader(ResDir("/CreateMask.shd"))) == SHADER_NONE) return false;
+	if ((m_Ambient[0]   = renderer->addShader(ResDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
+	if ((m_Lighting[0]  = renderer->addShader(ResDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
 	strcat(def, "#define SINGLE_SAMPLE\n");
-	if ((m_Ambient[1]   = renderer->addShader(ResDir"/Ambient.shd", def)) == SHADER_NONE) return false;
-	if ((m_Lighting[1]  = renderer->addShader(ResDir"/Lighting.shd", def)) == SHADER_NONE) return false;
-	if ((m_LightBlob[0] = renderer->addShader(ResDir"/LightBlob.shd")) == SHADER_NONE) return false;
-	if ((m_LightBlob[1] = renderer->addShader(ResDir"/LightBlob.shd", "#define DEFERRED\n")) == SHADER_NONE) return false;
+	if ((m_Ambient[1]   = renderer->addShader(ResDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
+	if ((m_Lighting[1]  = renderer->addShader(ResDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
+	if ((m_LightBlob[0] = renderer->addShader(ResDir("/LightBlob.shd"))) == SHADER_NONE) return false;
+	if ((m_LightBlob[1] = renderer->addShader(ResDir("/LightBlob.shd"), "#define DEFERRED\n")) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((m_TrilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;
@@ -240,20 +243,20 @@ bool App::load()
 	m_Clusters = ((Direct3D11Renderer *) renderer)->addTexture(tex);
 
 	// Textures
-	if ((m_Base[0] = renderer->addTexture  (ResDir"/Textures/Tx_wood_brown_shelf_small.dds",                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
-	if ((m_Bump[0] = renderer->addNormalMap(ResDir"/Textures/Tx_wood_brown_shelf_smallBump.dds", FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
+	if ((m_Base[0] = renderer->addTexture  (ResDir("/Textures/Tx_wood_brown_shelf_small.dds"),                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
+	if ((m_Bump[0] = renderer->addNormalMap(ResDir("/Textures/Tx_wood_brown_shelf_smallBump.dds"), FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
 
-	if ((m_Base[1] = renderer->addTexture  (ResDir"/Textures/wallpaper20.dds",                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
-	if ((m_Bump[1] = renderer->addNormalMap(ResDir"/Textures/wallpaper20Bump.dds", FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
+	if ((m_Base[1] = renderer->addTexture  (ResDir("/Textures/wallpaper20.dds"),                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
+	if ((m_Bump[1] = renderer->addNormalMap(ResDir("/Textures/wallpaper20Bump.dds"), FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
 
-	if ((m_Base[2] = renderer->addTexture  (ResDir"/Textures/floor_wood_4.dds",                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
-	if ((m_Bump[2] = renderer->addNormalMap(ResDir"/Textures/floor_wood_4Bump.dds", FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
+	if ((m_Base[2] = renderer->addTexture  (ResDir("/Textures/floor_wood_4.dds"),                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
+	if ((m_Bump[2] = renderer->addNormalMap(ResDir("/Textures/floor_wood_4Bump.dds"), FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
 
-	if ((m_Base[3] = renderer->addTexture  (ResDir"/Textures/floor_wood_3.dds",                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
-	if ((m_Bump[3] = renderer->addNormalMap(ResDir"/Textures/floor_wood_3Bump.dds", FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
+	if ((m_Base[3] = renderer->addTexture  (ResDir("/Textures/floor_wood_3.dds"),                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
+	if ((m_Bump[3] = renderer->addNormalMap(ResDir("/Textures/floor_wood_3Bump.dds"), FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
 
-	if ((m_Base[4] = renderer->addTexture  (ResDir"/Textures/light2.dds",                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
-	if ((m_Bump[4] = renderer->addNormalMap(ResDir"/Textures/light2Bump.dds", FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
+	if ((m_Base[4] = renderer->addTexture  (ResDir("/Textures/light2.dds"),                    true, m_TrilinearAniso, SRGB)) == TEXTURE_NONE) return false;
+	if ((m_Bump[4] = renderer->addNormalMap(ResDir("/Textures/light2Bump.dds"), FORMAT_RGBA8S, true, m_TrilinearAniso)) == TEXTURE_NONE) return false;
 
 	// Blendstates
 	if ((m_BlendAdd = renderer->addBlendState(ONE, ONE)) == BS_NONE) return false;
