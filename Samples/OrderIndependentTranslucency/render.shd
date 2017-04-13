@@ -1,0 +1,55 @@
+
+struct VsIn {
+	float4 position : Position;
+	float3 normal   : Normal;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float3 viewVec  : ViewVec;
+	float3 normal   : Normal;
+};
+
+[Vertex shader]
+
+float4x4 viewProj;
+float3 camPos;
+
+PsIn main(VsIn In){
+	PsIn Out;
+
+	Out.position = mul(viewProj, In.position);
+	Out.viewVec = camPos - In.position.xyz;
+	Out.normal = In.normal;
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color: SV_Target0;
+	float  depth: SV_Target1;
+};
+
+TextureCube Env;
+SamplerState filter;
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+
+	// Two-sided normals
+	float3 normal = frontFace? -In.normal : In.normal;
+
+	float3 viewVec = normalize(In.viewVec);
+	float3 reflVec = reflect(-In.viewVec, normal);
+
+	Out.color.rgb = Env.Sample(filter, reflVec).rgb;
+	// Set translucency depending on angle of incidence
+	Out.color.a = saturate(1.0 - dot(viewVec, normal));
+	// Write depth to second render target
+	Out.depth = In.position.z;
+
+	return Out;
+}

@@ -1,0 +1,68 @@
+
+struct GsIn {
+	float4 position : Position;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float2 texCoord : TexCoord;
+	float3 color    : Color;
+};
+
+[Vertex shader]
+
+Texture2D pos;
+uint mask, shift;
+
+GsIn main(uint VertexID : SV_VertexID){
+	GsIn Out;
+
+	// No vertex buffer used. Instead we fetch the position from particle render target.
+	int3 coord = int3(VertexID & mask, VertexID >> shift, 0);
+
+	Out.position = pos.Load(coord);
+
+	return Out;
+}
+
+[Geometry shader]
+
+Texture1D colors;
+SamplerState colorsFilter;
+
+float4x4 mvp;
+float3 dx, dy;
+
+[maxvertexcount(4)]
+void main(point GsIn In[1], inout TriangleStream<PsIn> Stream){
+	PsIn Out;
+
+	Out.color = colors.SampleLevel(colorsFilter, In[0].position.w * 0.25, 0);
+
+	// Output a billboarded quad
+	Out.position = mul(mvp, float4(In[0].position.xyz - dx - dy, 1.0));
+	Out.texCoord = float2(0, 0);
+	Stream.Append(Out);
+
+	Out.position = mul(mvp, float4(In[0].position.xyz + dx - dy, 1.0));
+	Out.texCoord = float2(1, 0);
+	Stream.Append(Out);
+
+	Out.position = mul(mvp, float4(In[0].position.xyz - dx + dy, 1.0));
+	Out.texCoord = float2(0, 1);
+	Stream.Append(Out);
+
+	Out.position = mul(mvp, float4(In[0].position.xyz + dx + dy, 1.0));
+	Out.texCoord = float2(1, 1);
+	Stream.Append(Out);
+}
+
+[Fragment shader]
+
+Texture2D tex;
+SamplerState particleFilter;
+
+float3 main(PsIn In) : SV_Target {
+	float3 base = tex.Sample(particleFilter, In.texCoord).rgb;
+	return base * In.color;
+}

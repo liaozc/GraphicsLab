@@ -1,0 +1,198 @@
+#define LIGHT_SIZE 64.0
+
+struct GsIn {
+	float4 light : Light;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float3 light    : Light;
+	float3 color    : Color;
+	float2 texCoord : TexCoord;
+	float2 zBounds  : ZBounds;
+};
+
+[Vertex shader]
+
+Texture2D pos;
+uint mask, shift;
+
+GsIn main(uint VertexID: SV_VertexID){
+	GsIn Out;
+
+	// No vertex buffer used. Instead we fetch the position from particle render target.
+	int3 coord = int3(VertexID & mask, VertexID >> shift, 0);
+	Out.light = pos.Load(coord);
+
+	return Out;
+}
+
+[Geometry shader]
+
+Texture1D colors;
+SamplerState colorsFilter;
+
+float4x4 modelview;
+float4 light;
+float ex, ey;
+float2 zw;
+
+/*
+	Compute the bounds of the light. Returns false if the light is outside of view.
+*/
+bool getScreenBox(const float3 pos, const float radius, out float lp, out float rp, out float tp, out float bp, out float zn, out float zf){
+	float4 lightPos = mul(modelview, float4(pos, 1.0));
+
+	// Compute z-bounds. Simplified code assuming standard projection matrix.
+	float z1 = lightPos.z + radius;
+	if (z1 <= 0) return false; // Light fully behind viewer
+
+	float z0 = max(lightPos.z - radius, 0.00001);
+
+	zn = saturate(zw.x + zw.y / z0);
+	zf = saturate(zw.x + zw.y / z1);
+
+
+	float radiusSqr = radius * radius;
+
+	lp = 0;
+	rp = 1;
+	bp = 0;
+	tp = 1;
+
+	// Compute extents in X
+	float Lxz = dot(lightPos.xz, lightPos.xz);
+	float iLxz = 1.0 / Lxz;
+	float a = radius * lightPos.x * iLxz;
+	float b = (radiusSqr - lightPos.z * lightPos.z) * iLxz;
+	float f = -b + a * a;
+
+	if (f > 0){
+		float Nx0 = a + sqrt(f);
+		float Nx1 = a - sqrt(f);
+		float Nz0 = (radius - Nx0 * lightPos.x) / lightPos.z;
+		float Nz1 = (radius - Nx1 * lightPos.x) / lightPos.z;
+		float N0 = Nz0 / Nx0;
+		float N1 = Nz1 / Nx1;
+
+		float x0 = saturate(0.5 - N0 * ex);
+		float x1 = saturate(0.5 - N1 * ex);
+
+		float Pz0 = (Lxz - radiusSqr) / (lightPos.z - lightPos.x * N0);
+		float Pz1 = (Lxz - radiusSqr) / (lightPos.z - lightPos.x * N1);
+
+		float Px0 = -Pz0 * N0;
+		float Px1 = -Pz1 * N1;
+
+		if (Px0 > lightPos.x) rp = x0;
+		if (Px0 < lightPos.x) lp = x0;
+		if (Px1 > lightPos.x && x1 < rp) rp = x1;
+		if (Px1 < lightPos.x && x1 > lp) lp = x1;
+	}
+
+	// Compute extents in Y
+	float Lyz = dot(lightPos.yz, lightPos.yz);
+	float iLyz = 1.0 / Lyz;
+	a = radius * lightPos.y * iLyz;
+	b = (radiusSqr - lightPos.z * lightPos.z) * iLyz;
+	f = -b + a * a;
+
+	if (f > 0){
+		float Ny0 = a + sqrt(f);
+		float Ny1 = a - sqrt(f);
+		float Nz0 = (radius - Ny0 * lightPos.y) / lightPos.z;
+		float Nz1 = (radius - Ny1 * lightPos.y) / lightPos.z;
+		float N0 = Nz0 / Ny0;
+		float N1 = Nz1 / Ny1;
+
+		float y0 = saturate(0.5 - N0 * ey);
+		float y1 = saturate(0.5 - N1 * ey);
+
+		float Pz0 = (Lyz - radiusSqr) / (lightPos.z - lightPos.y * N0);
+		float Pz1 = (Lyz - radiusSqr) / (lightPos.z - lightPos.y * N1);
+
+		float Py0 = -Pz0 * N0;
+		float Py1 = -Pz1 * N1;
+
+		if (Py0 > lightPos.y) tp = y0;
+		if (Py0 < lightPos.y) bp = y0;
+		if (Py1 > lightPos.y && y1 < tp) tp = y1;
+		if (Py1 < lightPos.y && y1 > bp) bp = y1;
+	}
+
+	return (lp < rp && bp < tp);
+}
+
+[maxvertexcount(4)]
+void main(point GsIn In[1], inout TriangleStream<PsIn> Stream){
+	PsIn Out;
+
+	float x0, y0, x1, y1, z0, z1;
+	if (getScreenBox(In[0].light.xyz, LIGHT_SIZE, x0, x1, y0, y1, z0, z1)){
+		Out.color = colors.SampleLevel(colorsFilter, In[0].light.w * 0.25, 0);
+
+		Out.light = In[0].light.xyz;
+		Out.zBounds = float2(z0, z1);		
+		Out.position.zw = 1;
+
+		// Output a clip-space rectangle for the light
+		Out.position.xy = float2(x0, y0) * 2.0 - 1.0;
+		Out.texCoord = Out.position.xy * float2(0.5, -0.5) + 0.5;
+		Stream.Append(Out);
+
+		Out.position.xy = float2(x1, y0) * 2.0 - 1.0;
+		Out.texCoord = Out.position.xy * float2(0.5, -0.5) + 0.5;
+		Stream.Append(Out);
+
+		Out.position.xy = float2(x0, y1) * 2.0 - 1.0;
+		Out.texCoord = Out.position.xy * float2(0.5, -0.5) + 0.5;
+		Stream.Append(Out);
+
+		Out.position.xy = float2(x1, y1) * 2.0 - 1.0;
+		Out.texCoord = Out.position.xy * float2(0.5, -0.5) + 0.5;
+		Stream.Append(Out);
+	}
+}
+
+[Fragment shader]
+
+Texture2D base;
+Texture2D normal;
+Texture2D depth;
+SamplerState filter;
+
+float4x4 invMvp;
+//float3 camPos;
+
+float3 main(PsIn In) : SV_Target {
+	float depth = depth.Sample(filter, In.texCoord).x;
+
+	// Only do lighting if depth is within the z-bounds of the light
+	[branch]
+	if (depth >= In.zBounds.x && depth <= In.zBounds.y){
+		float3 base = base.Sample(filter, In.texCoord).rgb;
+		float3 normal = normal.Sample(filter, In.texCoord).rgb * 2.0 - 1.0;
+
+		// Clip-space position, except x and y scale-biased (the invMvp has this prebaked into it)
+		float4 cPos = float4(In.texCoord, depth, 1);
+
+		// World-space position
+		float4 wPos = mul(invMvp, cPos);
+		float3 pos = wPos.xyz / wPos.w;
+
+		// Lighting
+		float3 lVec = (In.light.xyz - pos) * (1.0 / LIGHT_SIZE);
+		float3 lightVec = normalize(lVec);
+
+		float atten = saturate(1.0 - dot(lVec, lVec));
+		float diffuse = saturate(dot(lightVec, normal));
+
+		//float3 viewVec = normalize(camPos - pos);
+		//float specular = pow(saturate(dot(reflect(-viewVec, normal), lightVec)), 12.0);
+
+		return 0.7 * atten * In.color * (diffuse * base);
+		//return atten * In.color * (diffuse * base + specular);
+	} else {
+		return 0;
+	}
+}

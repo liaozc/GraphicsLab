@@ -1,0 +1,48 @@
+
+struct PsIn {
+	float4 position : SV_Position;
+	float2 texCoord : TexCoord;
+};
+
+[Vertex shader]
+
+float offset;
+
+PsIn main(uint VertexID: SV_VertexID){
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 2)?  3.0 : -1.0;
+	position.y = (VertexID == 0)? -3.0 :  1.0;
+	position.zw = 1.0;
+
+	Out.position = position;
+	// Half-pixel offset in DX10, no way!!! :p
+	// (Actually, in this particular case I want to use the upper-pixel corner coordinate, so there's no DX9 inheritance here ...)
+	Out.texCoord = position.xy * 0.5 + 0.5 - offset;
+
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 pos: SV_Target0;
+	float4 dir: SV_Target1;
+};
+
+float2 timeFactors;
+
+PsOut main(PsIn In){
+	PsOut Out;
+
+	float startTime = dot(In.texCoord.xy, timeFactors);
+
+	// Not the prettiest solution ... we're just placing all particles initially behind the viewer.
+	// Hopefully the viewer won't turn around the first 4 seconds :p
+	Out.pos = float4(512, 0, -1024, startTime);
+	Out.dir = 0;
+
+	return Out;
+}

@@ -265,7 +265,7 @@ ShaderID Renderer::addShader(const char *fileName, const char **attributeNames, 
 		ErrorMsg(String("Couldn't load \"") + fileName + "\"");
 	} else {
 #ifdef DEBUG
-		char str[66];
+		char str[120];
 		str[0] = '\n';
 		memset(str + 1, '-', sizeof(str) - 2);
 		str[sizeof(str) - 1] = '\0';

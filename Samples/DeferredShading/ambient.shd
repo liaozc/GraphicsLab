@@ -1,0 +1,60 @@
+
+struct PsIn {
+	float4 position: SV_Position;
+	float2 texCoord: TexCoord;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID: SV_VertexID){
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 2)?  3.0 : -1.0;
+	position.y = (VertexID == 0)? -3.0 :  1.0;
+	position.zw = 1.0;
+
+	Out.position = position;
+	Out.texCoord = position.xy * float2(0.5, -0.5) + 0.5;
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D base;
+Texture2D normal;
+Texture2D depth;
+SamplerState filter;
+
+float4x4 invMvp;
+//float3 camPos;
+
+float3 main(PsIn In) : SV_Target {
+	// Sample textures
+	float depth = depth.Sample(filter, In.texCoord).x;
+	float3 base = base.Sample(filter, In.texCoord).rgb;
+	float3 normal = normal.Sample(filter, In.texCoord).rgb * 2.0 - 1.0;
+
+	// Clip-space position, except x and y scale-biased (the invMvp has this prebaked into it)
+	float4 cPos = float4(In.texCoord, depth, 1);
+
+	// World-space position
+	float4 wPos = mul(invMvp, cPos);
+	float3 pos = wPos.xyz / wPos.w;
+
+	// Lighting from around the particle system
+	float3 lVec = float3(0, -150, 0) - pos;
+	float3 lightVec = normalize(lVec);
+
+	float atten = 1.0 / (1.0 + 0.008 * length(lVec));
+	float diffuse = saturate(dot(lightVec, normal));
+
+	//float3 viewVec = normalize(camPos - pos);
+	//float specular = pow(saturate(dot(reflect(-viewVec, normal), lightVec)), 12.0);
+
+	return atten * diffuse * base;
+//	return atten * (diffuse * base + 0.7 * specular);
+}
