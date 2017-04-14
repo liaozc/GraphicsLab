@@ -1,0 +1,42 @@
+
+struct VsIn {
+	float4 position : Position;
+	float4 normal : Normal;
+};
+
+struct PsIn {
+	float4 Pos : SV_POSITION;
+	float3 Normal : NORMAL;
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+float4x4 worldMatrix;	//for normal
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.Pos = mul(worldViewProj, In.position);
+	Out.Normal = mul(worldMatrix,In.normal) * 0.5;
+	return Out;
+}
+
+[Fragment shader]
+
+float3  vLightDir[2];
+float4  vLightColor[2];
+int lightIndex = 0;
+
+float4 main(PsIn In, bool frontFace : SV_IsFrontFace) :SV_Target {
+	if(lightIndex != 0){
+		return vLightColor[lightIndex - 1];
+	}
+	else {
+		float4 finalColor = 0;
+		for (int i = 0; i<2; i++){
+			finalColor += saturate(dot((float3)vLightDir[i],In.Normal) * vLightColor[i]); 
+		}
+		return finalColor;
+		
+	}
+}

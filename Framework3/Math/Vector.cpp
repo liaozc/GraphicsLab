@@ -1083,6 +1083,21 @@ mat4 cubeProjectionMatrixD3D(const float zNear, const float zFar){
 		0, 0, 1, 0);
 }
 
+mat4 makeViewMatrixD3D(vec3 eye, vec3 lookAt, vec3 up)
+{
+	vec3 zDir = normalize(lookAt - eye);
+	vec3 xDir = normalize(cross(up, zDir));
+	vec3 yDir = cross(zDir, xDir);
+	mat4 m(
+		xDir.x, xDir.y, xDir.z, -eye.x,
+		yDir.x, yDir.y, yDir.z, -eye.y,
+		zDir.x, zDir.y, zDir.z, -eye.z,
+		0, 0, 0, 1
+	);
+	return m;
+}
+
+
 mat2 identity2(){
 	return mat2(1,0, 0,1);
 }

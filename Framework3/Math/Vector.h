@@ -438,6 +438,7 @@ mat4 pegToFarPlane(const mat4 &m);
 mat4 cubeViewMatrix(const unsigned int side);
 mat4 cubeProjectionMatrixGL(const float zNear, const float zFar);
 mat4 cubeProjectionMatrixD3D(const float zNear, const float zFar);
+mat4 makeViewMatrixD3D(vec3 eye, vec3 lookAt, vec3 up);
 
 mat2 identity2();
 mat3 identity3();

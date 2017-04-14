@@ -69,14 +69,21 @@ bool App::load(){
 	if ((stencilSet   = renderer->addDepthState(false, false, ALWAYS, true, 0xFF, ALWAYS, REPLACE, REPLACE, REPLACE)) == BS_NONE) return false;
 
 	// Skybox
-	const char *fileNames[] = {
-		ResDir("/Textures/CubeMaps/UnionSquare/posx.jpg"),
-		ResDir("/Textures/CubeMaps/UnionSquare/negx.jpg"),
-		ResDir("/Textures/CubeMaps/UnionSquare/posy.jpg"),
-		ResDir("/Textures/CubeMaps/UnionSquare/negy.jpg"),
-		ResDir("/Textures/CubeMaps/UnionSquare/posz.jpg"),
-		ResDir("/Textures/CubeMaps/UnionSquare/negz.jpg"),
-	};
+	const char *fileNames[6];
+	std::string tempStr[6];
+	tempStr[0] = g_workDir + ("/Textures/CubeMaps/UnionSquare/posx.jpg");
+	fileNames[0] = tempStr[0].c_str();
+	tempStr[1] = g_workDir + ("/Textures/CubeMaps/UnionSquare/negx.jpg");
+	fileNames[1] = tempStr[1].c_str();
+	tempStr[2] = g_workDir + ("/Textures/CubeMaps/UnionSquare/posy.jpg");
+	fileNames[2] = tempStr[2].c_str();
+	tempStr[3] = g_workDir + ("/Textures/CubeMaps/UnionSquare/negy.jpg");
+	fileNames[3] = tempStr[3].c_str();
+	tempStr[4] = g_workDir + ("/Textures/CubeMaps/UnionSquare/posz.jpg");
+	fileNames[4] = tempStr[4].c_str();
+	tempStr[5] = g_workDir + ("/Textures/CubeMaps/UnionSquare/negx.jpg");
+	fileNames[5] = tempStr[5].c_str();
+
 	if ((env = renderer->addCubemap(fileNames, true, trilinearClamp)) == TEXTURE_NONE) return false;
 	
 	// Render targets 
