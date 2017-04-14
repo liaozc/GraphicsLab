@@ -91,7 +91,7 @@ bool App::init()
 	// No framework created depth buffer
 	depthBits = 0;
 
-	if (!m_Map.loadObj((ResDir("/Models/Map.obj")))) return false;
+	if (!m_Map.loadObj((ResDir("/Models/Map.hml")))) return false;
 	m_Map.scale(0, float3(1, 1, -1));
 
 	uint nIndices = m_Map.getIndexCount();

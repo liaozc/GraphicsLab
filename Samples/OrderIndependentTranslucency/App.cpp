@@ -28,7 +28,7 @@ bool App::init(){
 	initWorkDir();
 	// Load the geometry
 	model = new Model();
-	if (!model->loadObj(ResDir("/Models/Horse.obj"))){
+	if (!model->loadObj(ResDir("/Models/Horse.hml"))){
 		ErrorMsg("Couldn't load model file");
 		return false;
 	}

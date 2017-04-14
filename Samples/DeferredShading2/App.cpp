@@ -80,7 +80,7 @@ bool App::init(){
 	depthBits = 0;
 	
 	map = new Model();
-	if (!map->loadObj(ResDir("/Models/Map.obj"))) return false;
+	if (!map->loadObj(ResDir("/Models/Map.hml"))) return false;
 	map->scale(0, float3(1, 1, -1));
 
 	uint nIndices = map->getIndexCount();
