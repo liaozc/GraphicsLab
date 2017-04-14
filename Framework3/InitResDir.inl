@@ -1,6 +1,11 @@
 #include<string>
+
 std::string g_workDir;
-#define ResDir(localPath) (g_workDir + localPath).c_str()
+
+#define ShaderDir(localPath) (g_workDir + ProjectDir + localPath).c_str()
+
+#define ResDir(localPath) (g_workDir + "/Media" + localPath).c_str()
+
 void initWorkDir()
 {
 	char ch[256];
@@ -12,5 +17,5 @@ void initWorkDir()
 			path[i] = '/';
 	}
 	int slash = path.rfind('/');
-	g_workDir = path.substr(0, slash) + LocalDir;
+	g_workDir = path.substr(0, slash);
 }

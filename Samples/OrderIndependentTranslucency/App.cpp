@@ -1,6 +1,6 @@
 #include "App.h"
 
-#define LocalDir	"/Samples/OrderIndependentTranslucency"
+#define ProjectDir	"/Samples/OrderIndependentTranslucency"
 #include "InitResDir.inl"
 
 BaseApp *app = new App();
@@ -54,9 +54,9 @@ void App::exitAPI(){
 
 bool App::load(){
 	// Shaders
-	if ((render = renderer->addShader(ResDir("/render.shd"))) == SHADER_NONE) return false;
-	if ((sort = renderer->addShader(ResDir("/sort.shd"))) == SHADER_NONE) return false;
-	if ((stencilClear = renderer->addShader(ResDir("/stencilClear.shd"))) == SHADER_NONE) return false;
+	if ((render = renderer->addShader(ShaderDir("/render.shd"))) == SHADER_NONE) return false;
+	if ((sort = renderer->addShader(ShaderDir("/sort.shd"))) == SHADER_NONE) return false;
+	if ((stencilClear = renderer->addShader(ShaderDir("/stencilClear.shd"))) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((trilinearClamp = renderer->addSamplerState(TRILINEAR, CLAMP, CLAMP, CLAMP)) == SS_NONE) return false;
@@ -71,17 +71,17 @@ bool App::load(){
 	// Skybox
 	const char *fileNames[6];
 	std::string tempStr[6];
-	tempStr[0] = g_workDir + ("/Textures/CubeMaps/UnionSquare/posx.jpg");
+	tempStr[0] =  ResDir("/Textures/CubeMaps/UnionSquare/posx.jpg");
 	fileNames[0] = tempStr[0].c_str();
-	tempStr[1] = g_workDir + ("/Textures/CubeMaps/UnionSquare/negx.jpg");
+	tempStr[1] = ResDir("/Textures/CubeMaps/UnionSquare/negx.jpg");
 	fileNames[1] = tempStr[1].c_str();
-	tempStr[2] = g_workDir + ("/Textures/CubeMaps/UnionSquare/posy.jpg");
+	tempStr[2] = ResDir("/Textures/CubeMaps/UnionSquare/posy.jpg");
 	fileNames[2] = tempStr[2].c_str();
-	tempStr[3] = g_workDir + ("/Textures/CubeMaps/UnionSquare/negy.jpg");
+	tempStr[3] = ResDir("/Textures/CubeMaps/UnionSquare/negy.jpg");
 	fileNames[3] = tempStr[3].c_str();
-	tempStr[4] = g_workDir + ("/Textures/CubeMaps/UnionSquare/posz.jpg");
+	tempStr[4] = ResDir("/Textures/CubeMaps/UnionSquare/posz.jpg");
 	fileNames[4] = tempStr[4].c_str();
-	tempStr[5] = g_workDir + ("/Textures/CubeMaps/UnionSquare/negx.jpg");
+	tempStr[5] = ResDir("/Textures/CubeMaps/UnionSquare/negx.jpg");
 	fileNames[5] = tempStr[5].c_str();
 
 	if ((env = renderer->addCubemap(fileNames, true, trilinearClamp)) == TEXTURE_NONE) return false;

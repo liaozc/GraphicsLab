@@ -58,7 +58,7 @@ bool SmallExampleApp::load()
 	};
 	m_plain3d_vb = renderer->addVertexBuffer(sizeof(quad), STATIC, (void*)quad);
 	m_plain3d_ib = renderer->addIndexBuffer(sizeof(indices) / sizeof(ushort), sizeof(ushort), STATIC, indices);
-	m_plain3d_shd = renderer->addShader(ResDir("/plain3d.shd"));
+	m_plain3d_shd = renderer->addShader(ShaderDir("/plain3d.shd"));
 	FormatDesc format[] = { 
 		{0, TYPE_VERTEX, FORMAT_FLOAT, 3 },
 		{0, TYPE_TEXCOORD, FORMAT_FLOAT, 4 }
@@ -67,7 +67,7 @@ bool SmallExampleApp::load()
 	
 	//example 4
 
-	m_light_shd = renderer->addShader(ResDir("/simple_lit.shd"));
+	m_light_shd = renderer->addShader(ShaderDir("/simple_lit.shd"));
 	m_sphere = new Model();
 	m_sphere->createSphere(3);
 	m_sphere->computeNormals(false);

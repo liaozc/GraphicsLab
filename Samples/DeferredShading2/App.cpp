@@ -24,7 +24,7 @@
 #include "App.h"
 #include <string>
 
-#define LocalDir	"/Samples/DeferredShading2"
+#define ProjectDir	"/Samples/DeferredShading2"
 #include "InitResDir.inl"
 
 
@@ -80,7 +80,7 @@ bool App::init(){
 	depthBits = 0;
 	
 	map = new Model();
-	if (!map->loadObj(ResDir("/Models/Corridor2/Map.obj"))) return false;
+	if (!map->loadObj(ResDir("/Models/Map.obj"))) return false;
 	map->scale(0, float3(1, 1, -1));
 
 	uint nIndices = map->getIndexCount();
@@ -158,12 +158,12 @@ bool App::load(){
 	sprintf(def, "#define SAMPLE_COUNT %d\n", sampleCount);
 
 	// Shaders
-	if ((fillBuffers = renderer->addShader(ResDir("/FillBuffers.shd"))) == SHADER_NONE) return false;
-	if ((ambient     = renderer->addShader(ResDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
-	if ((createMask  = renderer->addShader(ResDir("/CreateMask.shd"))) == SHADER_NONE) return false;
-	if ((lighting[0] = renderer->addShader(ResDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
+	if ((fillBuffers = renderer->addShader(ShaderDir("/FillBuffers.shd"))) == SHADER_NONE) return false;
+	if ((ambient     = renderer->addShader(ShaderDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
+	if ((createMask  = renderer->addShader(ShaderDir("/CreateMask.shd"))) == SHADER_NONE) return false;
+	if ((lighting[0] = renderer->addShader(ShaderDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
 	strcat(def, "#define SINGLE_SAMPLE\n");
-	if ((lighting[1] = renderer->addShader(ResDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
+	if ((lighting[1] = renderer->addShader(ShaderDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((trilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;

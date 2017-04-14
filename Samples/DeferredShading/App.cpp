@@ -2,7 +2,7 @@
 #include "App.h"
 
 
-#define LocalDir	"//Samples/DeferredShading"
+#define ProjectDir	"//Samples/DeferredShading"
 #include "InitResDir.inl"
 
 BaseApp *app = new App();
@@ -74,12 +74,12 @@ void App::exitAPI(){
 
 bool App::load(){
 	// Shaders
-	if ((fillBuffers = renderer->addShader(ResDir("/fillBuffers.shd"))) == SHADER_NONE) return false;
-	if ((ambient     = renderer->addShader(ResDir("/ambient.shd")    )) == SHADER_NONE) return false;
-	if ((lighting    = renderer->addShader(ResDir("/lighting.shd")   )) == SHADER_NONE) return false;
-	if ((particles   = renderer->addShader(ResDir("/particles.shd")  )) == SHADER_NONE) return false;
-	if ((initParticles   = renderer->addShader(ResDir("/initParticles.shd")  )) == SHADER_NONE) return false;
-	if ((particlePhysics = renderer->addShader(ResDir("/particlePhysics.shd"))) == SHADER_NONE) return false;
+	if ((fillBuffers = renderer->addShader(ShaderDir("/fillBuffers.shd"))) == SHADER_NONE) return false;
+	if ((ambient     = renderer->addShader(ShaderDir("/ambient.shd")    )) == SHADER_NONE) return false;
+	if ((lighting    = renderer->addShader(ShaderDir("/lighting.shd")   )) == SHADER_NONE) return false;
+	if ((particles   = renderer->addShader(ShaderDir("/particles.shd")  )) == SHADER_NONE) return false;
+	if ((initParticles   = renderer->addShader(ShaderDir("/initParticles.shd")  )) == SHADER_NONE) return false;
+	if ((particlePhysics = renderer->addShader(ShaderDir("/particlePhysics.shd"))) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((trilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;

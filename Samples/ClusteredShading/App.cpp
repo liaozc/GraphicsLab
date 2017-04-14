@@ -26,7 +26,7 @@ const uint CLUSTER_Y = 8;
 const uint CLUSTER_Z = 32;
 
 
-#define LocalDir	"/Samples/ClusteredShading"
+#define ProjectDir	"/Samples/ClusteredShading"
 #include "InitResDir.inl"
 
 
@@ -91,7 +91,7 @@ bool App::init()
 	// No framework created depth buffer
 	depthBits = 0;
 
-	if (!m_Map.loadObj((g_workDir + "/Models/Corridor2/Map.obj").c_str())) return false;
+	if (!m_Map.loadObj((ResDir("/Models/Map.obj")))) return false;
 	m_Map.scale(0, float3(1, 1, -1));
 
 	uint nIndices = m_Map.getIndexCount();
@@ -199,18 +199,18 @@ bool App::load()
 	sprintf(def, "#define SAMPLE_COUNT %d\n", sampleCount);
 
 	// Shaders
-	if ((m_Clustered    = renderer->addShader(ResDir("/Clustered.shd"), DEFINE_STR(LIGHT_COUNT))) == SHADER_NONE) return false;
-	if ((m_ShowClusters = renderer->addShader(ResDir("/Clustered.shd"), DEFINE_STR(LIGHT_COUNT) "#define SHOW_CLUSTERS\n")) == SHADER_NONE) return false;
-	if ((m_PreZ         = renderer->addShader(ResDir("/PreZ.shd"))) == SHADER_NONE) return false;
-	if ((m_FillBuffers  = renderer->addShader(ResDir("/FillBuffers.shd"))) == SHADER_NONE) return false;
-	if ((m_CreateMask   = renderer->addShader(ResDir("/CreateMask.shd"))) == SHADER_NONE) return false;
-	if ((m_Ambient[0]   = renderer->addShader(ResDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
-	if ((m_Lighting[0]  = renderer->addShader(ResDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
+	if ((m_Clustered    = renderer->addShader(ShaderDir("/Clustered.shd"), DEFINE_STR(LIGHT_COUNT))) == SHADER_NONE) return false;
+	if ((m_ShowClusters = renderer->addShader(ShaderDir("/Clustered.shd"), DEFINE_STR(LIGHT_COUNT) "#define SHOW_CLUSTERS\n")) == SHADER_NONE) return false;
+	if ((m_PreZ         = renderer->addShader(ShaderDir("/PreZ.shd"))) == SHADER_NONE) return false;
+	if ((m_FillBuffers  = renderer->addShader(ShaderDir("/FillBuffers.shd"))) == SHADER_NONE) return false;
+	if ((m_CreateMask   = renderer->addShader(ShaderDir("/CreateMask.shd"))) == SHADER_NONE) return false;
+	if ((m_Ambient[0]   = renderer->addShader(ShaderDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
+	if ((m_Lighting[0]  = renderer->addShader(ShaderDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
 	strcat(def, "#define SINGLE_SAMPLE\n");
-	if ((m_Ambient[1]   = renderer->addShader(ResDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
-	if ((m_Lighting[1]  = renderer->addShader(ResDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
-	if ((m_LightBlob[0] = renderer->addShader(ResDir("/LightBlob.shd"))) == SHADER_NONE) return false;
-	if ((m_LightBlob[1] = renderer->addShader(ResDir("/LightBlob.shd"), "#define DEFERRED\n")) == SHADER_NONE) return false;
+	if ((m_Ambient[1]   = renderer->addShader(ShaderDir("/Ambient.shd"), def)) == SHADER_NONE) return false;
+	if ((m_Lighting[1]  = renderer->addShader(ShaderDir("/Lighting.shd"), def)) == SHADER_NONE) return false;
+	if ((m_LightBlob[0] = renderer->addShader(ShaderDir("/LightBlob.shd"))) == SHADER_NONE) return false;
+	if ((m_LightBlob[1] = renderer->addShader(ShaderDir("/LightBlob.shd"), "#define DEFERRED\n")) == SHADER_NONE) return false;
 
 	// Samplerstates
 	if ((m_TrilinearAniso = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP)) == SS_NONE) return false;
