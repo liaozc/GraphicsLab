@@ -1,6 +1,6 @@
 #include "examples.h"
 
-#define LocalDir	"/Samples/MyExample_002_ExampleSet"
+#define ProjectDir	"/Samples/MyExample_002_ExampleSet"
 #include "InitResDir.inl"
 
 #include "Util/Model.h"
@@ -172,6 +172,7 @@ void SmallExampleApp::drawFrame()
 			vec4(1,1,0,1),
 			vec4(0,0,1,1)
 		};
+		renderer->reset();
 		renderer->setShader(m_light_shd);
 		renderer->setShaderConstant1i("lightIndex",0);
 		renderer->setShaderConstantArray4f("vLightDir", vLightDir, 2);
