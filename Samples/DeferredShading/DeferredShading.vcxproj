@@ -111,9 +111,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Ambient.shd" />
-    <None Include="CreateMask.shd" />
     <None Include="FillBuffers.shd" />
+    <None Include="initParticles.shd" />
     <None Include="Lighting.shd" />
+    <None Include="particlePhysics.shd" />
+    <None Include="particles.shd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />

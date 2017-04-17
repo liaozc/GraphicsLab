@@ -43,6 +43,7 @@ void App::onSize(const int w, const int h){
 }
 
 bool App::init(){
+	
 	initWorkDir();
 
 	initNoise();
@@ -192,7 +193,7 @@ void App::drawFrame(){
 	modelview.translate(-camPos);
 	float4x4 mvp = projection * modelview;
 	// Pre-scale-bias the matrix so I can use the texCoord directly in [0..1] range instead of [-1..1] clip-space range
-	float4x4 invMvp = (!mvp) * (translate(-1.0f, 1.0f, 0.0f) * scale(2.0f, -2.0f, 1.0f));
+	float4x4 invMvp = (!mvp) * (translate(-1.0f, 1.0f, 0.0f) * scale(2.0f, -2.0f, 1.0f));//liao:?
 
 
 	if (!pause){
