@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Include="plain3d.shd" />
     <None Include="simple_lit.shd" />
+    <None Include="texture.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{29D2D721-C3F4-45E3-864C-69458201B2AF}</ProjectGuid>

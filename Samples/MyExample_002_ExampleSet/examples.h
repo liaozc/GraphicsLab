@@ -9,6 +9,7 @@ class SmallExampleApp : public D3D11App
 {
 public:
 	bool init();
+	void exit();
 	char *getTitle() const { return "flat triangle scene"; }
 	void drawFrame();
 	bool onKey(const uint key, const bool pressed);
@@ -36,6 +37,15 @@ protected:
 
 	ShaderID m_light_shd;
 
+	//example - texture
+	SamplerStateID m_texture_shd;
+	SamplerStateID m_texture_sample_id;
+	TextureID m_texture_id;
+	Model* m_cube;
+	float4x4 m_cube_mvp;
+	float4x4 m_cube_world;
+
+	RasterizerStateID m_texture_raster_id;
 
 };
 

@@ -25,14 +25,21 @@ bool SmallExampleApp::init()
 
 	m_light_shd = SHADER_NONE;
 		
+	m_texture_shd = SHADER_NONE;
 	return true;
+}
+
+void SmallExampleApp::exit()
+{
+	delete m_sphere;
+	delete m_cube;
 }
 
 bool SmallExampleApp::load()
 {
 	//exmaple 2 and 3
 	DrawVert quad[] = {
-		{ vec3(-1,1,-1),vec4(0.5f,1,1,1)},
+		{vec3(-1,1,-1),vec4(0.5f,1,1,1)},
 		{vec3(-1,-1,-1),vec4(0.5f,0.5f,1,1)},
 		{vec3(1,-1,-1),vec4(0.5f,1,0.5f,1)},
 		{vec3(1,1,-1), vec4(1, 0.5f, 1, 1)},
@@ -77,6 +84,17 @@ bool SmallExampleApp::load()
 	GetClientRect(hwnd, &rect);
 	m_ratio = float(rect.bottom - rect.top) / float(rect.right - rect.left);
 
+
+	m_texture_shd = renderer->addShader(ShaderDir("/texture.shd"));
+	m_texture_sample_id = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP);
+	m_texture_id = renderer->addTexture(ResDir("./Textures/seafloor.dds"), m_texture_sample_id);
+	m_texture_raster_id = renderer->addRasterizerState(CULL_BACK);
+
+	m_cube = new Model();
+	m_cube->createCube(2,true);
+	m_cube->computeNormals(false);
+	m_cube->makeDrawable(renderer, false, m_texture_shd);
+
 	return true;
 }
 
@@ -101,8 +119,8 @@ void SmallExampleApp::updateTime()
 			m_plain3d_mvp_asteroid = toD3DProjection(mvp);
 		}
 	}
-
-	if (m_example_id == 3) {
+	
+	if (m_example_id == 3 || m_example_id == 4) {
 		m_sphere_big_world = rotateY(time) * scale(2,2,2);
 		vec3 eye(0, 1, -10);
 		vec3 lookAt(0, 0, 0);
@@ -123,6 +141,22 @@ void SmallExampleApp::updateTime()
 		m_sphere_small_static = toD3DProjection(mvp);
 
 	}
+
+	if (m_example_id == 4) {
+	
+		m_cube_world = rotateY(time);
+		vec3 eye(0, 3, -10);
+		vec3 lookAt(0, 0, 0);
+		vec3 up(0, 1, 0);
+		mat4 view = makeViewMatrixD3D(eye, lookAt, up);
+		mat4 proj = perspectiveMatrix(PI / 2, 2, 100);
+		proj.rows[0] *= m_ratio;
+		mat4 mvp = proj * view * m_cube_world;
+		m_cube_world = toD3DProjection(m_cube_world);
+		m_cube_mvp = toD3DProjection(mvp);
+
+	}
+
 }
 
 void SmallExampleApp::drawFrame()
@@ -162,8 +196,7 @@ void SmallExampleApp::drawFrame()
 		}
 		
 	}
-	else if (m_example_id == 3)	{
-		
+	if (m_example_id == 3 || m_example_id == 4)	{
 		vec4 vLightDir[2] = { 
 			normalize(vec4(m_sphere_small_world_static.rows[0].w,m_sphere_small_world_static.rows[1].w,m_sphere_small_world_static.rows[2].w,0)),
 			normalize(vec4(m_sphere_small_world_rotaty.rows[0].w,m_sphere_small_world_rotaty.rows[1].w,m_sphere_small_world_rotaty.rows[2].w,0))
@@ -173,16 +206,28 @@ void SmallExampleApp::drawFrame()
 			vec4(0,0,1,1)
 		};
 		renderer->reset();
-		renderer->setShader(m_light_shd);
-		renderer->setShaderConstant1i("lightIndex",0);
-		renderer->setShaderConstantArray4f("vLightDir", vLightDir, 2);
-		renderer->setShaderConstantArray4f("vLightColor", vLightColor, 2);
-		renderer->setShaderConstant4x4f("worldViewProj", m_sphere_big);
-		renderer->setShaderConstant4x4f("worldMatrix", m_sphere_big_world);
-		
-		renderer->apply();
-		m_sphere->draw(renderer);
-		
+		if (m_example_id == 3) {
+			renderer->setShader(m_light_shd);
+			renderer->setShaderConstant1i("lightIndex", 0);
+			renderer->setShaderConstantArray4f("vLightDir", vLightDir, 2);
+			renderer->setShaderConstantArray4f("vLightColor", vLightColor, 2);
+			renderer->setShaderConstant4x4f("worldViewProj", m_sphere_big);
+			renderer->setShaderConstant4x4f("worldMatrix", m_sphere_big_world);
+			renderer->apply();
+			m_sphere->draw(renderer);
+		}
+		if (m_example_id == 4) {
+			renderer->setRasterizerState(m_texture_raster_id);
+			renderer->setShader(m_texture_shd);
+			renderer->setShaderConstant4x4f("worldViewProj", m_cube_mvp);
+			renderer->setShaderConstant4x4f("worldMatrix", m_cube_world);
+			renderer->setShaderConstant1i("lightIndex", 0);
+			renderer->setShaderConstantArray4f("vLightDir", vLightDir, 2);
+			renderer->setShaderConstantArray4f("vLightColor", vLightColor, 2);
+			renderer->setTexture("texDiffuse", m_texture_id);
+			renderer->apply();
+			m_cube->draw(renderer);
+		}
 		renderer->setShaderConstant1i("lightIndex", 1);
 		renderer->setShaderConstant4x4f("worldViewProj", m_sphere_small_static);
 		renderer->apply();
@@ -193,6 +238,7 @@ void SmallExampleApp::drawFrame()
 		renderer->apply();
 		m_sphere->draw(renderer);
 	}
+
 }
 
 bool SmallExampleApp::onKey(const uint key, const bool pressed)

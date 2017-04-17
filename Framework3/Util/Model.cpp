@@ -88,6 +88,124 @@ void Model::createSphere(const int subDivLevel){
 	addBatch(0, nVertices);
 }
 
+void Model::createCube(float size, bool withTexCoord)
+{
+	const int nVertices = 8;
+
+	float3 *vertices = new float3[nVertices];
+	vertices[0] = float3(-size, size, -size);
+	vertices[1] = float3(-size, -size, -size);
+	vertices[2] = float3(size, -size, -size);
+	vertices[3] = float3(size, size, -size);
+	vertices[4] = float3(-size, size, size);
+	vertices[5] = float3(-size, -size, size);
+	vertices[6] = float3(size, -size, size);
+	vertices[7] = float3(size, size, size);
+
+	uint * indices = new uint[36];
+	int index = 0;
+	indices[index++] = 0;
+	indices[index++] = 2;
+	indices[index++] = 1;
+	indices[index++] = 0;
+	indices[index++] = 3;
+	indices[index++] = 2;
+
+	indices[index++] = 4;
+	indices[index++] = 6;
+	indices[index++] = 7;
+	indices[index++] = 4;
+	indices[index++] = 5;
+	indices[index++] = 6;
+
+	indices[index++] = 0;
+	indices[index++] = 7;
+	indices[index++] = 3;
+	indices[index++] = 0;
+	indices[index++] = 4;
+	indices[index++] = 7;
+
+	indices[index++] = 1;
+	indices[index++] = 2;
+	indices[index++] = 6;
+	indices[index++] = 1;
+	indices[index++] = 6;
+	indices[index++] = 5;
+
+	indices[index++] = 0;
+	indices[index++] = 5;
+	indices[index++] = 4;
+	indices[index++] = 0;
+	indices[index++] = 1;
+	indices[index++] = 5;
+
+	indices[index++] = 3;
+	indices[index++] = 7;
+	indices[index++] = 6;
+	indices[index++] = 3;
+	indices[index++] = 6;
+	indices[index++] = 2;
+	
+	addStream(TYPE_VERTEX, 3, nVertices, (float *)vertices, indices, false);
+	nIndices = 36;
+	addBatch(0, nVertices);
+
+	if (withTexCoord) {
+		float2 *texCoords = new float2[nVertices];
+		texCoords[0] = float2(0,0);
+		texCoords[1] = float2(0, 1);
+		texCoords[2] = float2(1, 1);
+		texCoords[3] = float2(1, 0);
+
+		uint * texIndices = new uint[36];
+		int index = 0;
+		texIndices[index++] = 0;
+		texIndices[index++] = 2;
+		texIndices[index++] = 1;
+		texIndices[index++] = 0;
+		texIndices[index++] = 3;
+		texIndices[index++] = 2;
+
+		texIndices[index++] = 0;
+		texIndices[index++] = 2;
+		texIndices[index++] = 3;
+		texIndices[index++] = 0;
+		texIndices[index++] = 1;
+		texIndices[index++] = 2;
+
+		texIndices[index++] = 1;
+		texIndices[index++] = 3;
+		texIndices[index++] = 2;
+		texIndices[index++] = 1;
+		texIndices[index++] = 0;
+		texIndices[index++] = 3;
+
+		texIndices[index++] = 1;
+		texIndices[index++] = 2;
+		texIndices[index++] = 3;
+		texIndices[index++] = 1;
+		texIndices[index++] = 3;
+		texIndices[index++] = 0;
+
+		texIndices[index++] = 3;
+		texIndices[index++] = 1;
+		texIndices[index++] = 0;
+		texIndices[index++] = 3;
+		texIndices[index++] = 2;
+		texIndices[index++] = 1;
+
+		texIndices[index++] = 0;
+		texIndices[index++] = 3;
+		texIndices[index++] = 2;
+		texIndices[index++] = 0;
+		texIndices[index++] = 2;
+		texIndices[index++] = 1;
+
+		addStream(TYPE_TEXCOORD, 2, nVertices, (float *)texCoords, texIndices, true);
+	}
+	
+}
+
 StreamID Model::findStream(const AttributeType type, const uint index) const {
 	uint count = 0;
 	for (uint i = 0; i < streams.getCount(); i++){
