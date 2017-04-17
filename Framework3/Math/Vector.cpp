@@ -958,6 +958,17 @@ mat4 perspectiveMatrix(const float fov, const float zNear, const float zFar){
 		0, 0, 1, 0);
 }
 
+mat4 perspectiveMatrix(const float fov, const float aspectRatio, float zNear, const float zFar)
+{
+	float s = cosf(0.5f * fov) / sinf(0.5f * fov);
+
+	return mat4(
+		s * aspectRatio, 0, 0, 0,
+		0, s, 0, 0,
+		0, 0, (zFar + zNear) / (zFar - zNear), -(2 * zFar * zNear) / (zFar - zNear),
+		0, 0, 1, 0);
+}
+
 mat4 perspectiveMatrixX(const float fov, const int width, const int height, const float zNear, const float zFar){
 	float w = cosf(0.5f * fov) / sinf(0.5f * fov);
 	float h = (w * width) / height;
@@ -1088,13 +1099,21 @@ mat4 makeViewMatrixD3D(vec3 eye, vec3 lookAt, vec3 up)
 	vec3 zDir = normalize(lookAt - eye);
 	vec3 xDir = normalize(cross(up, zDir));
 	vec3 yDir = cross(zDir, xDir);
-	mat4 m(
-		xDir.x, xDir.y, xDir.z, -eye.x,
-		yDir.x, yDir.y, yDir.z, -eye.y,
-		zDir.x, zDir.y, zDir.z, -eye.z,
+	mat4 mRot(
+		xDir.x, xDir.y, xDir.z, 0,
+		yDir.x, yDir.y, yDir.z, 0,
+		zDir.x, zDir.y, zDir.z, 0,
 		0, 0, 0, 1
 	);
-	return m;
+	
+	mat4 mTranslate(
+		1, 0, 0, -eye.x,
+		0, 1, 0, -eye.y,
+		0, 0, 1, -eye.z,
+		0, 0, 0, 1
+	);
+
+	return mRot * mTranslate;
 }
 
 

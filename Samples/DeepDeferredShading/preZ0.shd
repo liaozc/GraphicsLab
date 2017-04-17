@@ -1,0 +1,20 @@
+
+struct VsIn {
+	float4 position : Position;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+};
+
+[Vertex shader]
+
+float4x4 viewProj;
+
+PsIn main(VsIn In){
+	PsIn Out;
+
+	Out.position = mul(viewProj, In.position);
+
+	return Out;
+}

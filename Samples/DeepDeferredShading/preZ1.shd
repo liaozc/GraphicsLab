@@ -1,0 +1,36 @@
+
+struct VsIn {
+	float4 position : Position;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+};
+
+[Vertex shader]
+
+float4x4 viewProj;
+
+PsIn main(VsIn In){
+	PsIn Out;
+
+	Out.position = mul(viewProj, In.position);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2DArray Depth;
+SamplerState filter;
+
+float2 invSize;
+
+void main(PsIn In){
+	float3 screenCoord = float3(In.position.xy * invSize, 0.0);
+	float depth = Depth.Sample(filter, screenCoord).x;
+
+	// Peel away pixels from previous layers. Use a small bias to avoid precision issues.
+	clip(In.position.z - depth - 0.0000001);
+}

@@ -1,0 +1,50 @@
+
+struct PsIn {
+	float4 position: SV_Position;
+	float3 texCoord[LAYERS]: TexCoord;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID: SV_VertexID){
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	Out.position.x = (VertexID == 2)?  3.0 : -1.0;
+	Out.position.y = (VertexID == 0)? -3.0 :  1.0;
+	Out.position.zw = 1.0;
+
+	// Output texture coordinates for all layers to reduce computations in the pixel shader.
+	[unroll]
+	for (uint i = 0; i < LAYERS; i++){
+		Out.texCoord[i].xy = Out.position.xy * float2(0.5, -0.5) + 0.5;
+		Out.texCoord[i].z = i;
+	}
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2DArray Base;
+SamplerState filter;
+
+float3 main(PsIn In) : SV_Target {
+	float3 color = 0;
+	// Intuitively we should start on 1.0, but I've just moved the
+	// final multiplication with 0.2 to here to save one instruction.
+	float blend = 0.2;
+
+	// Sample each layer and blend
+	[unroll]
+	for (uint i = 0; i < LAYERS; i++){
+		float4 base = Base.Sample(filter, In.texCoord[i]);
+
+		// Iteratively computed blend factor
+		color += (blend * base.a) * base.rgb;
+		blend *= 1.0 - base.a;
+	}
+
+	return color;
+}

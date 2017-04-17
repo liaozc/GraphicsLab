@@ -36,6 +36,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExample_002_ExampleSet", 
 		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeepDeferredShading", "Samples\DeepDeferredShading\DeepDeferredShading.vcxproj", "{EE524B9E-48E1-4EC5-B173-F955CD1D596C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{224EB325-62BC-429F-BCBD-64533087859B} = {224EB325-62BC-429F-BCBD-64533087859B}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExample_003_ShadowMap", "Samples\MyExample_003_ShadowMap\MyExample_003_ShadowMap.vcxproj", "{612F8459-4F45-44B1-BEEF-9B0930F9F39E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -102,6 +112,20 @@ Global
 		{29D2D721-C3F4-45E3-864C-69458201B2AF}.Release|x64.Build.0 = Release|x64
 		{29D2D721-C3F4-45E3-864C-69458201B2AF}.Release|x86.ActiveCfg = Release|Win32
 		{29D2D721-C3F4-45E3-864C-69458201B2AF}.Release|x86.Build.0 = Release|Win32
+		{EE524B9E-48E1-4EC5-B173-F955CD1D596C}.Debug|x64.ActiveCfg = Debug|Win32
+		{EE524B9E-48E1-4EC5-B173-F955CD1D596C}.Debug|x86.ActiveCfg = Debug|Win32
+		{EE524B9E-48E1-4EC5-B173-F955CD1D596C}.Debug|x86.Build.0 = Debug|Win32
+		{EE524B9E-48E1-4EC5-B173-F955CD1D596C}.Release|x64.ActiveCfg = Release|Win32
+		{EE524B9E-48E1-4EC5-B173-F955CD1D596C}.Release|x86.ActiveCfg = Release|Win32
+		{EE524B9E-48E1-4EC5-B173-F955CD1D596C}.Release|x86.Build.0 = Release|Win32
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Debug|x64.ActiveCfg = Debug|x64
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Debug|x64.Build.0 = Debug|x64
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Debug|x86.ActiveCfg = Debug|Win32
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Debug|x86.Build.0 = Debug|Win32
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Release|x64.ActiveCfg = Release|x64
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Release|x64.Build.0 = Release|x64
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Release|x86.ActiveCfg = Release|Win32
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,5 +133,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6829AB14-2678-4380-9698-9599F3FA0514} = {BBCFA2EB-C1A8-4C71-BA4E-A3752CDD2D3E}
 		{29D2D721-C3F4-45E3-864C-69458201B2AF} = {BBCFA2EB-C1A8-4C71-BA4E-A3752CDD2D3E}
+		{612F8459-4F45-44B1-BEEF-9B0930F9F39E} = {BBCFA2EB-C1A8-4C71-BA4E-A3752CDD2D3E}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,44 @@
+
+struct VsIn {
+	float4 position : Position;
+	float4 normal : Normal;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float4 normal : NORMAL;
+	float4 worldPosition: TEXCOORD0;
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+float4x4 worldMatrix;	//for normal
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = mul(worldViewProj, In.position);
+	Out.normal = In.normal;
+	Out.worldPosition = mul(worldMatrix, In.position);
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color:SV_Target0;
+};
+
+float4 vLightPos;
+float4 vLightColor;
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+	float4 vLightDir = normalize(vLightPos);
+	float3 dist3 = In.worldPosition - vLightPos;
+	float dist = 1/dot(dist3,dist3);
+	Out.color = saturate(dot((float3)vLightDir,In.normal) * vLightColor * dist); 
+	//Out.color = abs(In.normal);
+	//Out.color = float4(dist3,1);
+	return Out;
+}

@@ -429,6 +429,7 @@ mat4 translate(const vec3 &v);
 mat4 translate(const float x, const float y, const float z);
 mat4 scale(const float x, const float y, const float z);
 mat4 perspectiveMatrix(const float fov, const float zNear, const float zFar);
+mat4 perspectiveMatrix(const float fov, const float aspectRatio,float zNear, const float zFar);
 mat4 perspectiveMatrixX(const float fov, const int width, const int height, const float zNear, const float zFar);
 mat4 perspectiveMatrixY(const float fov, const int width, const int height, const float zNear, const float zFar);
 mat4 orthoMatrixX(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);

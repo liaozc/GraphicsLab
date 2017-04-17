@@ -1,0 +1,72 @@
+
+struct VsIn {
+	float4 position : Position;
+	//float2 texCoord : TexCoord;
+	//float3 tangent  : Tangent;
+	//float3 binormal : Binormal;
+	//float3 normal   : Normal;
+};
+
+struct GsIn {
+	float3 position : Position;
+};
+
+struct GsOut {
+	float4 position : SV_Position;
+	uint face: SV_RenderTargetArrayIndex;
+};
+
+[Vertex shader]
+
+GsIn main(VsIn In){
+	GsIn Out;
+
+	Out.position = In.position.xyz;
+
+	return Out;
+}
+
+[Geometry shader]
+
+float4x4 viewProjArray[6];
+
+[maxvertexcount(18)]
+void main(triangle GsIn In[3], inout TriangleStream<GsOut> Stream){
+	GsOut Out;
+
+	// Loop over cube faces
+	[unroll]
+	for (int i = 0; i < 6; i++){
+		float4 pos[3];
+		pos[0] = mul(viewProjArray[i], float4(In[0].position.xyz, 1.0));
+		pos[1] = mul(viewProjArray[i], float4(In[1].position.xyz, 1.0));
+		pos[2] = mul(viewProjArray[i], float4(In[2].position.xyz, 1.0));
+
+		// Use frustum culling to improve performance
+		float4 t0 = saturate(pos[0].xyxy * float4(-1, -1, 1, 1) - pos[0].w);
+		float4 t1 = saturate(pos[1].xyxy * float4(-1, -1, 1, 1) - pos[1].w);
+		float4 t2 = saturate(pos[2].xyxy * float4(-1, -1, 1, 1) - pos[2].w);
+		float4 t = t0 * t1 * t2;
+
+		[branch]
+		if (!any(t))
+		{
+			// Use backface culling to improve performance
+			float2 d0 = pos[1].xy * pos[0].w - pos[0].xy * pos[1].w;
+			float2 d1 = pos[2].xy * pos[0].w - pos[0].xy * pos[2].w;
+
+			[branch]
+			if (d1.x * d0.y > d0.x * d1.y || min(min(pos[0].w, pos[1].w), pos[2].w) < 0.0)
+			{
+				Out.face = i;
+
+				[unroll]
+				for (int k = 0; k < 3; k++){
+					Out.position = pos[k];
+					Stream.Append(Out);
+				}
+				Stream.RestartStrip();
+			}
+		}
+	}
+}

@@ -1,0 +1,90 @@
+
+struct GsIn {
+	float3 position : Position;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float2 texCoord : TexCoord;
+};
+
+[Vertex shader]
+
+float4 main() : SV_Position {
+	return 0;
+}
+
+[Geometry shader]
+
+float4x4 viewProj;
+float3 dx, dy;
+float3 light;
+
+[maxvertexcount(4)]
+void main(point void In[1], inout TriangleStream<PsIn> Stream){
+	PsIn Out;
+
+	// Output a billboarded quad
+	float4 pos[4];
+	pos[0] = mul(viewProj, float4(light - dx - dy, 1.0));
+	pos[1] = mul(viewProj, float4(light + dx - dy, 1.0));
+	pos[2] = mul(viewProj, float4(light - dx + dy, 1.0));
+	pos[3] = mul(viewProj, float4(light + dx + dy, 1.0));
+
+	// Use frustum culling to improve performance
+	float4 t0 = saturate(pos[0].xyxy * float4(-1, -1, 1, 1) - pos[0].w);
+	float4 t1 = saturate(pos[1].xyxy * float4(-1, -1, 1, 1) - pos[1].w);
+	float4 t2 = saturate(pos[2].xyxy * float4(-1, -1, 1, 1) - pos[2].w);
+	float4 t3 = saturate(pos[3].xyxy * float4(-1, -1, 1, 1) - pos[3].w);
+	float4 t = (t0 * t1) * (t2 * t3);
+
+	[branch]
+	if (!any(t))
+	{
+		Out.position = pos[0];
+		Out.texCoord = float2(0, 0);
+		Stream.Append(Out);
+
+		Out.position = pos[1];
+		Out.texCoord = float2(1, 0);
+		Stream.Append(Out);
+
+		Out.position = pos[2];
+		Out.texCoord = float2(0, 1);
+		Stream.Append(Out);
+
+		Out.position = pos[3];
+		Out.texCoord = float2(1, 1);
+		Stream.Append(Out);
+	}
+}
+
+[Fragment shader]
+
+Texture2D Light;
+SamplerState lightFilter;
+
+Texture2DArray Base;
+Texture2DArray Depth;
+
+float3 main(PsIn In) : SV_Target {
+	float3 light = Light.Sample(lightFilter, In.texCoord).rgb;
+
+	int4 screenCoord = int4(In.position.xy, 0, 0);
+	float blend = 1;
+
+	// Loop through all layers in front of the light
+	[unroll]
+	for (screenCoord.z = 0; screenCoord.z < LAYERS; screenCoord.z++){
+		[branch]
+		if (blend > 0.0){
+			float depth = Depth.Load(screenCoord).x;
+			if (In.position.z < depth) break;
+
+			float4 base = Base.Load(screenCoord);
+			blend *= 1.0 - base.a;
+		}
+	}
+
+	return light * blend;
+}

@@ -715,8 +715,8 @@ TextureID Direct3D10Renderer::addRenderTarget(const int width, const int height,
 		if (flags & USE_MIPGEN){
 			desc.MiscFlags |= D3D10_RESOURCE_MISC_GENERATE_MIPS;
 		}
-
-		if (FAILED(device->CreateTexture2D(&desc, NULL, (ID3D10Texture2D **) &tex.texture))){
+		HRESULT result = device->CreateTexture2D(&desc, NULL, (ID3D10Texture2D **)&tex.texture);
+		if (FAILED(result)){
 			ErrorMsg("Couldn't create render target");
 			return TEXTURE_NONE;
 		}

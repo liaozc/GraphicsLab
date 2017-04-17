@@ -19,22 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="examples.cpp" />
+    <ClCompile Include="App.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="examples.h" />
+    <ClInclude Include="App.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="plain_color.shd" />
-    <None Include="simple_lit.shd" />
-    <None Include="texture.shd" />
+    <None Include="plain_light.shd" />
+    <None Include="plain_normal.shd" />
+    <None Include="shadow.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{29D2D721-C3F4-45E3-864C-69458201B2AF}</ProjectGuid>
+    <ProjectGuid>{612F8459-4F45-44B1-BEEF-9B0930F9F39E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MyExample_001_Empty</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>MyExample_002_ExampleSet</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
