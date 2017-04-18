@@ -1,0 +1,30 @@
+
+struct VsIn {
+	float4 position : Position;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = mul(worldViewProj, In.position);
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float color:SV_Target0;
+};
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+	Out.color = In.position.z;
+	return Out;
+}

@@ -1,0 +1,77 @@
+
+struct VsIn {
+	float4 position : Position;
+	float4 normal : Normal;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float4 position2 : POSITION;
+	float4 normal : NORMAL;
+	float4 worldPosition: TEXCOORD0;
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+float4x4 worldMatrix;	//for normal
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = mul(worldViewProj, In.position);
+	Out.position2 = mul(worldViewProj, In.position);
+	Out.normal = mul(worldMatrix, In.normal);
+	Out.worldPosition = mul(worldMatrix,In.position);
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color:SV_Target0;
+};
+
+float4 vLightPos;
+float4 vLightColor;
+
+Texture2D shadowMap;
+SamplerState fliter;
+
+float4x4 invViewProj;
+float4x4 lightMVP;
+
+int needShadow = 0;
+
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+	float4 shadowCoord = In.worldPosition - vLightPos;
+	float4 vLightDir = normalize(-shadowCoord);
+	float3 dist3 = In.worldPosition - vLightPos;
+	float dist = 1/dot(dist3,dist3);
+	float shadow = 1;
+	float4 cPos;
+	if(needShadow == 1){
+		shadow = 0;
+		// Clip-space position, except x and y scale-biased (the invViewProj has this prebaked into it)
+		cPos = In.position2;
+		cPos = cPos/cPos.w;
+		// World-space position
+		float4 wPos = mul(invViewProj, cPos);
+		float3 pos =  wPos.xyz / wPos.w;//In.worldPosition;
+		float4 posLightSpace = mul(lightMVP,float4(pos,1));
+		pos = posLightSpace.xyz / posLightSpace.w;
+		float4 t = saturate(pos.xyxy * float4(-1,-1,1,1) - float4(1,1,1,1));
+		if(!any(t)) {
+			shadow = shadowMap.Sample(fliter, pos.xy * 0.5 + float2(0.5,0.5)).r;
+			if(pos.z > shadow + 0.1 )
+				shadow = 0;
+			else
+				shadow = 1;
+		}
+	}
+	Out.color = saturate(dot((float3)vLightDir,In.normal) * vLightColor * dist * 25 * shadow) + float4(0.2,0.2,0.2,0.2); 
+	//Out.color = float4(abs(cPos.www) * 0.6 ,1);
+
+	return Out;
+}

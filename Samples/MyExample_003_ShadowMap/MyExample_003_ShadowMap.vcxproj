@@ -25,9 +25,12 @@
     <ClInclude Include="App.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="light_shadow.shd" />
     <None Include="plain_light.shd" />
     <None Include="plain_normal.shd" />
-    <None Include="shadow.shd" />
+    <None Include="plain_texture.shd" />
+    <None Include="shadow_gs.shd" />
+    <None Include="shadow_ps.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{612F8459-4F45-44B1-BEEF-9B0930F9F39E}</ProjectGuid>

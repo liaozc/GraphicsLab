@@ -87,7 +87,7 @@ bool SmallExampleApp::load()
 
 	m_texture_shd = renderer->addShader(ShaderDir("/texture.shd"));
 	m_texture_sample_id = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP);
-	m_texture_id = renderer->addTexture(ResDir("./Textures/seafloor.dds"), m_texture_sample_id);
+	m_texture_id = renderer->addTexture(ResDir("./Textures/seafloor.dds"), false,m_texture_sample_id);
 	m_texture_raster_id = renderer->addRasterizerState(CULL_BACK);
 
 	m_cube = new Model();
