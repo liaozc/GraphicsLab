@@ -1,10 +1,8 @@
 #include "App.h"
 #include "Util/Model.h"
 
-#define ProjectDir	"/Samples/MyExample_003_ShadowMap"
+#define ProjectDir	"/Samples/MyExample_003_ShadowMap_Spot_ColorB"
 #include "InitResDir.inl"
-
-//#define USING_GEOMETRY_SHADER_AND_DEPTH 
 
 #include "Util/Model.h"
 
@@ -41,7 +39,6 @@ void ShadowMapApp::exit()
 bool ShadowMapApp::load()
 {
 
-	m_plain_normal_shd = renderer->addShader(ShaderDir("/plain_normal.shd"));
 	m_plain_light_shd = renderer->addShader(ShaderDir("/plain_light.shd"));
 	m_light_shdadow_shd = renderer->addShader(ShaderDir("/light_shadow.shd"));
 	m_plain_texture_shd = renderer->addShader(ShaderDir("/plain_texture.shd"));
@@ -49,7 +46,7 @@ bool ShadowMapApp::load()
 	m_sphere = new Model();
 	m_sphere->createSphere(3);
 	m_sphere->computeNormals(false);
-	m_sphere->makeDrawable(renderer, true, m_plain_normal_shd);
+	m_sphere->makeDrawable(renderer, true, m_light_shdadow_shd);
 
 	DrawVert verts[] = {
 		{ vec3(-10,-5,10),vec3(0,1,0) },
@@ -88,12 +85,9 @@ bool ShadowMapApp::load()
 
 	m_shadow_map_ssid = renderer->addSamplerState(BILINEAR, WRAP, WRAP, WRAP);
 	//two shadow map
-	m_shadow_cubemap_id = renderer->addRenderTarget(256, 256, FORMAT_R16F, m_shadow_map_ssid,CUBEMAP|SAMPLE_DEPTH);
 	m_shadow_map_id = renderer->addRenderTarget(256, 256, FORMAT_R16F, m_shadow_map_ssid);
-	m_shadow_map_gs_shd = renderer->addShader(ShaderDir("/shadow_gs.shd"));
 	m_shadow_map_ps_shd = renderer->addShader(ShaderDir("/shadow_ps.shd"));
-	m_texture_id = renderer->addTexture(ResDir("./Textures/seafloor.dds"), false, m_shadow_map_ssid);
-
+	
 	RECT rect;
 	GetClientRect(hwnd, &rect);
 	m_ratio = float(rect.bottom - rect.top) / float(rect.right - rect.left);
@@ -131,27 +125,6 @@ void ShadowMapApp::drawFrame()
 
 	float zNear = 0.01f;
 	float zFar = 100;
-#ifdef USING_GEOMETRY_SHADER_AND_DEPTH
-	//prepare shadow map
-	renderer->changeRenderTargets(NULL, 0, m_shadow_cubemap_id);
-		renderer->clear(false, true, NULL, 1.0f);
-
-		// Compute view projection matrices for the faces of the cubemap
-		float4x4 viewProjArray[6];
-		float4x4 proj = cubeProjectionMatrixD3D(zNear, zFar);
-		for (uint k = 0; k < 6; k++) {
-			viewProjArray[k] = proj * cubeViewMatrix(k) * translate(-vLightPos.xyz());
-		}
-
-		renderer->reset();
-		renderer->setRasterizerState(cullBack);
-		renderer->setShader(m_shadow_map_gs_shd);
-		renderer->setShaderConstantArray4x4f("viewProjArray", viewProjArray, 6);
-		renderer->apply();
-		
-		m_sphere->draw(renderer);
-	renderer->changeToMainFramebuffer();
-#else // US PS Method
 	renderer->changeRenderTargets(&m_shadow_map_id,1,-1,0);
 		float col_depth[] = {1,0,0,1};
 		renderer->clear(true, true, col_depth, 1.0f); //renderer to zFar
@@ -170,7 +143,6 @@ void ShadowMapApp::drawFrame()
 		m_sphere->draw(renderer);
 
 	renderer->changeToMainFramebuffer();
-#endif
 
 	float col[4] = { 0.5f,0.5f,0.5f,1 };
 	renderer->clear(true, true, col, 1.0f);

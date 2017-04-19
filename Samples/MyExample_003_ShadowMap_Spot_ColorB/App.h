@@ -16,37 +16,31 @@ public:
 	void updateFrame();
 protected:
 	Model* m_sphere;
-	
-	TextureID m_shadow_cubemap_id;
+	//for shadow map
 	SamplerStateID m_shadow_map_ssid;
-	ShaderID m_shadow_map_gs_shd;
-
 	TextureID m_shadow_map_id;
 	ShaderID m_shadow_map_ps_shd;
-	ShaderID	m_plain_texture_shd;
-	TextureID m_texture_id;
-
-	ShaderID m_plain_normal_shd;
+	//for using shadow map	
 	ShaderID m_light_shdadow_shd;
-	
+	//for 
 	float4x4 m_world_for_nomal;
 	float4x4 m_sphere_mvp;
-
+	//
 	float m_ratio;
-
+	//for draw light
 	ShaderID m_plain_light_shd;
 	float4x4 m_light_mvp;
 	float4x4 m_light_wrold;
-	float m_light_dist;
 
-	//also can be done by using a cube.
+	//for the ground also can be done by using a cube. 
 	VertexBufferID m_quad_vb;
 	IndexBufferID m_quad_ib;
 	VertexFormatID m_quad_vf;
-
+	
+	//for  show the shadow texture
 	VertexBufferID m_quad_vb_for_showSM;
 	VertexFormatID m_quad_vf_for_showSM;
-
+	ShaderID	m_plain_texture_shd;
 };
 
 #endif
