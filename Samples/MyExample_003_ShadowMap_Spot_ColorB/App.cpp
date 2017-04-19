@@ -84,7 +84,6 @@ bool ShadowMapApp::load()
 	
 
 	m_shadow_map_ssid = renderer->addSamplerState(BILINEAR, WRAP, WRAP, WRAP);
-	//two shadow map
 	m_shadow_map_id = renderer->addRenderTarget(256, 256, FORMAT_R16F, m_shadow_map_ssid);
 	m_shadow_map_ps_shd = renderer->addShader(ShaderDir("/shadow_ps.shd"));
 	
@@ -148,13 +147,6 @@ void ShadowMapApp::drawFrame()
 	renderer->clear(true, true, col, 1.0f);
 
 	float4x4 invViewProj = (!m_sphere_mvp);
-
-	vec4 posT = m_sphere_mvp * vec4(1, 1, 1, 1);
-	posT /= posT.w;
-	posT = invViewProj * posT;
-	posT /= posT.w;
-
-	float4x4 identity = invViewProj * m_sphere_mvp;
 	
 	vec4 vLightColor(1, 1, 1, 1);
 	renderer->reset();

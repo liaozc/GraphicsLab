@@ -995,11 +995,11 @@ mat4 orthoMatrixX(const float left, const float right, const float top, const fl
 	float rl = right - left;
 	float tb = top - bottom;
 	float fn = zFar - zNear;
-
+	//origin orthomatrix seems not right
 	return mat4(
 		2.0f / rl, 0,         0,         -(right + left) / rl,
 		0,         2.0f / tb, 0,         -(top + bottom) / tb,
-		0,         0,        -2.0f / fn, -(zFar + zNear) / fn,
+		0,         0,        1.0f/fn/*-2.0f / fn*/, /*-(zFar + zNear) / fn*/- zNear/ fn,
 		0,         0,         0,         1);
 }
 

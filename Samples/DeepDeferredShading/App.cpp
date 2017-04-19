@@ -107,7 +107,7 @@ bool App::load(){
 
 	//addRenderTarget(const int width, const int height, const int depth, const int mipMapCount, const int arraySize, const FORMAT format, const int msaaSamples = 1, const SamplerStateID samplerState = SS_NONE, uint flags = 0)
 	// Main render targets					   /*(256, 256, 1, FORMAT_DEPTH16, 1, SS_NONE, CUBEMAP | SAMPLE_DEPTH)*/
-	if ((shadowMap = renderer->addRenderTarget(256,256,1,1,1, FORMAT_R16UI,1,SS_NONE, CUBEMAP | SAMPLE_DEPTH)) == TEXTURE_NONE) return false;
+	if ((shadowMap = renderer->addRenderDepth(256, 256, 1, FORMAT_DEPTH16, 1, SS_NONE, CUBEMAP | SAMPLE_DEPTH)) == TEXTURE_NONE) return false;
 											  /*(width, height, 1, LAYERS, FORMAT_RGBA8,   1, SS_NONE, RENDER_SLICES)*/
 	if ((baseRT    = renderer->addRenderTarget(width,height,1,1,LAYERS,FORMAT_RGBA8,1,SS_NONE,RENDER_SLICES)) == TEXTURE_NONE) return false;
 	if ((normalRT  = renderer->addRenderTarget(width, height,1, 1, LAYERS, FORMAT_RGB10A2, 1, SS_NONE, RENDER_SLICES)) == TEXTURE_NONE) return false;

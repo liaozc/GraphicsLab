@@ -1,0 +1,17 @@
+
+struct PsIn {
+	float4 position: SV_Position;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID: SV_VertexID){
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	Out.position.x = (VertexID == 2)?  3.0 : -1.0;
+	Out.position.y = (VertexID == 0)? -3.0 :  1.0;
+	Out.position.zw = 1.0;
+
+	return Out;
+}

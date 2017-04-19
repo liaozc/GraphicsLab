@@ -26,14 +26,12 @@ struct PsOut {
 	float4 color:SV_Target0;
 };
 
-Texture2D tex;
+TextureCube cube;
 SamplerState fliter;
 
 PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
 	PsOut Out;
-	Out.color = tex.Sample(fliter,In.texcoord);
+	Out.color = cube.Sample(fliter,In.texcoord);
 	Out.color.a = 1;
 	return Out;
 }
-
-

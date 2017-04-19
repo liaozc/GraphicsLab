@@ -136,7 +136,7 @@ void App::drawFrame(){
 		renderer->setShader(render);
 		renderer->setShaderConstant4x4f("viewProj", viewProj);
 		renderer->setShaderConstant3f("camPos", camPos);
-		renderer->setTexture("Env", env);`
+		renderer->setTexture("Env", env);
 		renderer->setSamplerState("filter", trilinearClamp);
 		renderer->setDepthState(stencilRoute, 0);
 		renderer->apply();
