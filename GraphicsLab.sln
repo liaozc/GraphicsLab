@@ -50,6 +50,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExample_004_ShadowMap(Poi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExample_005_OIT", "Samples\MyExample_005_OIT\MyExample_005_OIT.vcxproj", "{B146AEE4-41CA-43A9-9DD9-FF6D9566129D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ModernLightMapping", "Samples\ModernLightMapping\ModernLightMapping.vcxproj", "{F0DDE805-7F50-4E47-A4FD-3430EC85430A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -146,6 +151,14 @@ Global
 		{B146AEE4-41CA-43A9-9DD9-FF6D9566129D}.Release|x64.Build.0 = Release|x64
 		{B146AEE4-41CA-43A9-9DD9-FF6D9566129D}.Release|x86.ActiveCfg = Release|Win32
 		{B146AEE4-41CA-43A9-9DD9-FF6D9566129D}.Release|x86.Build.0 = Release|Win32
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Debug|x64.ActiveCfg = Debug|x64
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Debug|x64.Build.0 = Debug|x64
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Debug|x86.ActiveCfg = Debug|Win32
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Debug|x86.Build.0 = Debug|Win32
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Release|x64.ActiveCfg = Release|x64
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Release|x64.Build.0 = Release|x64
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Release|x86.ActiveCfg = Release|Win32
+		{F0DDE805-7F50-4E47-A4FD-3430EC85430A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
