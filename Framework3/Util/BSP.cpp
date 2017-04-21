@@ -251,7 +251,8 @@ no_alias bool BNode::intersects(const vec3 &v0, const vec3 &v1, const vec3 &dir,
 				if (triangle) *triangle = &tri;
 				return true;
 			}
-			if (back != NULL && back->intersects(v0, v1, dir, point, triangle)) return true;
+			if (back != NULL && back->intersects(v0, v1, dir, point, triangle)) 
+				return true;
 		}
 	} else {
 		if (back != NULL && back->intersects(v0, v1, dir, point, triangle)) return true;
@@ -262,7 +263,8 @@ no_alias bool BNode::intersects(const vec3 &v0, const vec3 &v1, const vec3 &dir,
 				if (triangle) *triangle = &tri;
 				return true;
 			}
-			if (front != NULL && front->intersects(v0, v1, dir, point, triangle)) return true;
+			if (front != NULL && front->intersects(v0, v1, dir, point, triangle))
+				return true;
 		}
 	}
 #endif

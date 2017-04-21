@@ -1,0 +1,53 @@
+
+struct VsIn {
+	float4 position : Position;
+	float4 normal : Normal;
+	float2 texcoord : TexCoord0;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float4 normal : NORMAL;
+	float2 texcoord :TEXCOORD0;
+};
+
+[Vertex shader]
+
+float4x4 viewProj;
+float4x4 worldMatrix; // for normal
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = mul(worldMatrix, In.position);
+	Out.position = mul(viewProj, Out.position);
+	Out.normal = mul(worldMatrix,In.normal);
+	Out.texcoord = In.texcoord;
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color: SV_Target0;
+};
+
+struct LightNode {
+	float3 Position;
+	float  Intensity;
+	float3 Color;
+	float  NotUsed; //i don't know if we need to set the struct size of 4's intenger times.
+};
+
+LightNode Lights[2]; 
+
+Texture2D LightMap;
+
+SamplerState fliter;
+float4 color;
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+	Out.color.rgb = LightMap.Sample(fliter,In.texcoord).rgb + float3(0.1,0.1,0.1);
+	Out.color.a = 1;
+	return Out;
+}

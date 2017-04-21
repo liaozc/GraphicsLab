@@ -480,8 +480,7 @@ bool App::load()
 	};
 
 
-	static const char* file_names[] =
-	{
+	static const char* file_names[] = {
 		file_name_str[0].c_str(),
 		file_name_str[1].c_str(),
 		file_name_str[2].c_str(),

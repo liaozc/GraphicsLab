@@ -90,62 +90,63 @@ void Model::createSphere(const int subDivLevel){
 
 void Model::createCube(float size, bool withTexCoord)
 {
-	const int nVertices = 8;
+	const int nVertices = 24;
 
 	float3 *vertices = new float3[nVertices];
-	vertices[0] = float3(-size, size, -size);
-	vertices[1] = float3(-size, -size, -size);
-	vertices[2] = float3(size, -size, -size);
-	vertices[3] = float3(size, size, -size);
-	vertices[4] = float3(-size, size, size);
-	vertices[5] = float3(-size, -size, size);
-	vertices[6] = float3(size, -size, size);
-	vertices[7] = float3(size, size, size);
 
+	float3 vF_LT(-size, size, -size);
+	float3 vF_RT(size, size, -size);
+	float3 vF_RB(size, -size, -size);
+	float3 vF_LB(-size, -size, -size);
+
+	float3 vB_LT(-size, size, size);
+	float3 vB_RT(size, size, size);
+	float3 vB_RB(size, -size, size);
+	float3 vB_LB(-size, -size, size);
+
+	int vIndex = 0;
+	//front
+	vertices[vIndex++] = vF_LT;
+	vertices[vIndex++] = vF_RT;
+	vertices[vIndex++] = vF_RB;
+	vertices[vIndex++] = vF_LB;
+	//back
+	vertices[vIndex++] = vB_RT;
+	vertices[vIndex++] = vB_LT;
+	vertices[vIndex++] = vB_LB;
+	vertices[vIndex++] = vB_RB;
+	//top
+	vertices[vIndex++] = vB_LT;
+	vertices[vIndex++] = vB_RT;
+	vertices[vIndex++] = vF_RT;
+	vertices[vIndex++] = vF_LT;
+	//bottom
+	vertices[vIndex++] = vB_RB;
+	vertices[vIndex++] = vB_LB;
+	vertices[vIndex++] = vF_LB;
+	vertices[vIndex++] = vF_RB;
+	//left
+	vertices[vIndex++] = vB_LT;
+	vertices[vIndex++] = vF_LT;
+	vertices[vIndex++] = vF_LB;
+	vertices[vIndex++] = vB_LB;
+	//right
+	vertices[vIndex++] = vF_RT;
+	vertices[vIndex++] = vB_RT;
+	vertices[vIndex++] = vB_RB;
+	vertices[vIndex++] = vF_RB;
+	
 	uint * indices = new uint[36];
 	int index = 0;
-	indices[index++] = 0;
-	indices[index++] = 2;
-	indices[index++] = 1;
-	indices[index++] = 0;
-	indices[index++] = 3;
-	indices[index++] = 2;
-
-	indices[index++] = 4;
-	indices[index++] = 6;
-	indices[index++] = 7;
-	indices[index++] = 4;
-	indices[index++] = 5;
-	indices[index++] = 6;
-
-	indices[index++] = 0;
-	indices[index++] = 7;
-	indices[index++] = 3;
-	indices[index++] = 0;
-	indices[index++] = 4;
-	indices[index++] = 7;
-
-	indices[index++] = 1;
-	indices[index++] = 2;
-	indices[index++] = 6;
-	indices[index++] = 1;
-	indices[index++] = 6;
-	indices[index++] = 5;
-
-	indices[index++] = 0;
-	indices[index++] = 5;
-	indices[index++] = 4;
-	indices[index++] = 0;
-	indices[index++] = 1;
-	indices[index++] = 5;
-
-	indices[index++] = 3;
-	indices[index++] = 7;
-	indices[index++] = 6;
-	indices[index++] = 3;
-	indices[index++] = 6;
-	indices[index++] = 2;
-	
+	for (int i = 0; i < 6; ++i) {
+		indices[index++] = i * 4 + 0;
+		indices[index++] = i * 4 + 1;
+		indices[index++] = i * 4 + 2;
+		indices[index++] = i * 4 + 0;
+		indices[index++] = i * 4 + 2;
+		indices[index++] = i * 4 + 3;
+	}
+		
 	addStream(TYPE_VERTEX, 3, nVertices, (float *)vertices, indices, false);
 	nIndices = 36;
 	addBatch(0, nVertices);
@@ -153,54 +154,12 @@ void Model::createCube(float size, bool withTexCoord)
 	if (withTexCoord) {
 		float2 *texCoords = new float2[nVertices];
 		texCoords[0] = float2(0,0);
-		texCoords[1] = float2(0, 1);
+		texCoords[1] = float2(1, 0);
 		texCoords[2] = float2(1, 1);
-		texCoords[3] = float2(1, 0);
+		texCoords[3] = float2(0, 1);
 
 		uint * texIndices = new uint[36];
-		int index = 0;
-		texIndices[index++] = 0;
-		texIndices[index++] = 2;
-		texIndices[index++] = 1;
-		texIndices[index++] = 0;
-		texIndices[index++] = 3;
-		texIndices[index++] = 2;
-
-		texIndices[index++] = 0;
-		texIndices[index++] = 2;
-		texIndices[index++] = 3;
-		texIndices[index++] = 0;
-		texIndices[index++] = 1;
-		texIndices[index++] = 2;
-
-		texIndices[index++] = 1;
-		texIndices[index++] = 3;
-		texIndices[index++] = 2;
-		texIndices[index++] = 1;
-		texIndices[index++] = 0;
-		texIndices[index++] = 3;
-
-		texIndices[index++] = 1;
-		texIndices[index++] = 2;
-		texIndices[index++] = 3;
-		texIndices[index++] = 1;
-		texIndices[index++] = 3;
-		texIndices[index++] = 0;
-
-		texIndices[index++] = 3;
-		texIndices[index++] = 1;
-		texIndices[index++] = 0;
-		texIndices[index++] = 3;
-		texIndices[index++] = 2;
-		texIndices[index++] = 1;
-
-		texIndices[index++] = 0;
-		texIndices[index++] = 3;
-		texIndices[index++] = 2;
-		texIndices[index++] = 0;
-		texIndices[index++] = 2;
-		texIndices[index++] = 1;
-
+		memcpy(texIndices, indices, sizeof(uint) * 36);
 		addStream(TYPE_TEXCOORD, 2, nVertices, (float *)texCoords, texIndices, true);
 	}
 	
