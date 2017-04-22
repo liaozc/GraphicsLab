@@ -21,6 +21,7 @@ public:
 	char *getTitle() const { return "light-map scene"; }
 	void drawFrame();
 	bool init();
+	void exit();
 	bool load();
 	void updateFrame();
 protected:

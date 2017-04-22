@@ -20,6 +20,12 @@ bool LightMapApp::init()
 	return true;
 }
 
+void LightMapApp::exit()
+{
+	delete m_cube;
+	delete m_sphere;
+}
+
 bool LightMapApp::load()
 {
 	m_light_lm_shd = renderer->addShader(ShaderDir("/light_lm.shd"));
@@ -80,8 +86,10 @@ bool LightMapApp::load()
 	RECT rect;
 	GetClientRect(hwnd, &rect);
 	m_ratio = float(rect.bottom - rect.top) / float(rect.right - rect.left);
-	
+
+#if 0
 	preComputeLightMap();
+#endif
 	m_lm0_id = renderer->addTexture(ShaderDir("/LightMap0.dds"), 1, SS_NONE);
 	m_lm1_id = renderer->addTexture(ShaderDir("/LightMap1.dds"), 1, SS_NONE);
 	m_lm2_id = renderer->addTexture(ShaderDir("/LightMap2.dds"), 1, SS_NONE);
