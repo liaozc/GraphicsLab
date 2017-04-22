@@ -201,6 +201,7 @@ void LightMapApp::computFace(const vec3& v0, const vec3& v1, const vec3& v2, con
 		for (int j = top; j < bottom; ++j) {
 			for (int i = left; i < right; ++i) {
 				float3 samplePos = v0 + (j - top) * dirT * divY + (i - left) * dirS * divX;
+				m_bsp.pushSphere(samplePos, 0.1f);
 				if (m_bsp.intersects(m_lights[lightIndex].Position, samplePos)) {
 					continue;
 				}
@@ -250,8 +251,8 @@ void LightMapApp::preComputeLightMap()
 		float3 v1 = vec3(30, 0, 30);
 		float3 v2 = vec3(30, 0, -30);
 		float3 v3 = vec3(-30, 0, -30);
-		m_bsp.addTriangle(v0, v1, v2);
-		m_bsp.addTriangle(v0, v2, v3);
+		//m_bsp.addTriangle(v0, v1, v2);
+		//m_bsp.addTriangle(v0, v2, v3);
 	}
 	m_bsp.build();
 
