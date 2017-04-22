@@ -1,4 +1,4 @@
-#include "examples.h"
+#include "App.h"
 
 #define ProjectDir	"/Samples/MyExample_002_ExampleSet"
 #include "InitResDir.inl"
@@ -110,13 +110,13 @@ void SmallExampleApp::updateTime()
 		mat4 proj = perspectiveMatrix(PI / 2, 2, 100);
 		proj.rows[0] *= m_ratio;
 		mat4 mvp = proj * view * world;
-		m_plain3d_mvp = toD3DProjection(mvp);
+		m_plain3d_mvp = mvp;
 
 		if (m_example_id == 2) {
 			mat4 world = translate(0, 0, 4);
 			world = rotateZXY(time * 2, time * 1.5f, time * 1.6f) * world * scale(0.4f, 0.4f, 0.4f);
 			mat4 mvp = proj * view * world;
-			m_plain3d_mvp_asteroid = toD3DProjection(mvp);
+			m_plain3d_mvp_asteroid = mvp;
 		}
 	}
 	
@@ -129,16 +129,16 @@ void SmallExampleApp::updateTime()
 		mat4 proj = perspectiveMatrix(PI / 2, 2, 100);
 		proj.rows[0] *= m_ratio;
 		mat4 mvp = proj * view * m_sphere_big_world;
-		m_sphere_big = toD3DProjection(mvp);
-		m_sphere_big_world = toD3DProjection(m_sphere_big_world);
+		m_sphere_big = mvp;
+		m_sphere_big_world = m_sphere_big_world;
 		
 		m_sphere_small_world_rotaty = rotateZXY(0,time,1.5f * time) *translate(5, 0, 0) * scale(0.25f, 0.25f, 0.25f);
 		mvp = proj * view * m_sphere_small_world_rotaty;
-		m_sphere_small_rotaty = toD3DProjection(mvp);
+		m_sphere_small_rotaty = mvp;
 
 		m_sphere_small_world_static = rotateZXY(time * 0.5f, time * 2.0f, 1.5f * time) * translate(-3, 3, -3) * scale(0.25f, 0.25f, 0.25f);
 		mvp = proj * view * m_sphere_small_world_static;
-		m_sphere_small_static = toD3DProjection(mvp);
+		m_sphere_small_static = mvp;
 
 	}
 
@@ -152,8 +152,8 @@ void SmallExampleApp::updateTime()
 		mat4 proj = perspectiveMatrix(PI / 2, 2, 100);
 		proj.rows[0] *= m_ratio;
 		mat4 mvp = proj * view * m_cube_world;
-		m_cube_world = toD3DProjection(m_cube_world);
-		m_cube_mvp = toD3DProjection(mvp);
+		m_cube_world = m_cube_world;
+		m_cube_mvp = mvp;
 
 	}
 

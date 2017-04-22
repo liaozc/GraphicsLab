@@ -462,7 +462,7 @@ public:
 
 	// Backward compatibility
 	void clear(const bool clearColor, const bool clearDepth, const float *color = NULL, const float depth = 1.0f){
-		clear(clearColor, clearDepth, false, color, 1.0f, 0);
+		clear(clearColor, clearDepth, false, color, depth, 0);
 	}
 	virtual void clear(const bool clearColor, const bool clearDepth, const bool clearStencil, const float *color = NULL, const float depth = 1.0f, const uint stencil = 0) = 0;
 

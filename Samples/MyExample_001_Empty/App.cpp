@@ -1,4 +1,4 @@
-#include "emptyApp.h"
+#include "App.h"
 
 BaseApp *app = new EmptyApp();
 

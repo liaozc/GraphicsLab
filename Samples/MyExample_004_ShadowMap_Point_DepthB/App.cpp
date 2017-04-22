@@ -108,7 +108,7 @@ bool ShadowMapApp_PointDepthB::load()
 	m_shadow_map_id = renderer->addRenderDepth(256, 256, 1, FORMAT_DEPTH16, 1, m_shadow_map_ssid, CUBEMAP | SAMPLE_DEPTH);
 	m_shadow_map_gs_shd = renderer->addShader(ShaderDir("/shadow_gs.shd"));
 	
-
+	
 	m_triClamp_ssid = renderer->addSamplerState(TRILINEAR, CLAMP, CLAMP, CLAMP);
 	const char *fileNames[6];
 	std::string tempStr[6];

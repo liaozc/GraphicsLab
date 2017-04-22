@@ -157,9 +157,16 @@ void Model::createCube(float size, bool withTexCoord)
 		texCoords[1] = float2(1, 0);
 		texCoords[2] = float2(1, 1);
 		texCoords[3] = float2(0, 1);
-
 		uint * texIndices = new uint[36];
-		memcpy(texIndices, indices, sizeof(uint) * 36);
+		index = 0;
+		for (int i = 0; i < 6; ++i) {
+			texIndices[index++] = 0;
+			texIndices[index++] = 1;
+			texIndices[index++] = 2;
+			texIndices[index++] = 0;
+			texIndices[index++] = 2;
+			texIndices[index++] = 3;
+		}
 		addStream(TYPE_TEXCOORD, 2, nVertices, (float *)texCoords, texIndices, true);
 	}
 	

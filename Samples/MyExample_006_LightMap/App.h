@@ -35,8 +35,11 @@ protected:
 	 //-- since i don't know how to assign texture co-coordinate to sphere, i just skip it with cube.
 	Model* m_cube;
 	float4x4 m_cube0_world;
+	float4x4 m_cube0_world_normal;
 	float4x4 m_cube1_world;
+	float4x4 m_cube1_world_normal;
 	float4x4 m_cube2_world;
+	float4x4 m_cube2_world_normal;
 	
 	ShaderID m_light_lm_shd;
 
@@ -44,9 +47,13 @@ protected:
 
 	Model* m_sphere;
 	
-
 	Light m_lights[6];
 
+	mat4 m_move_light;
+	//for shadow map
+	SamplerStateID m_shadow_map_ssid;
+	TextureID m_shadow_map_id;
+	ShaderID m_shadow_map_gs_shd;
 
 	uint m_lm_width;
 	uint m_lm_height;
@@ -58,9 +65,18 @@ protected:
 	BSP m_bsp;
 
 	BlendStateID m_light_blend;
+
+	//for  show the shadow texture
+	ShaderID	m_plain_texture_shd;
+	VertexBufferID m_cube_vb_for_showSM;
+	VertexFormatID m_cube_vf_for_showSM;
+	IndexBufferID m_cube_ib_for_showSM;
+	float4x4 m_cube_mvp;
+	TextureID m_cube_tex; //for testing cube texture renderer.
+	SamplerStateID m_triClamp_ssid;
 	
 	float m_ratio;
-	
+	float m_width;
 };
 
 

@@ -9,18 +9,20 @@ struct PsIn {
 	float4 position : SV_Position;
 	float4 normal : NORMAL;
 	float2 texcoord :TEXCOORD0;
+	float4 worldPos : TEXCOORD1;
 };
 
 [Vertex shader]
 
 float4x4 viewProj;
-float4x4 worldMatrix; // for normal
+float4x4 worldMatrix; 
+float4x4 worldMatrixNormal; // for normal
 
 PsIn main(VsIn In){
 	PsIn Out;
-	Out.position = mul(worldMatrix, In.position);
-	Out.position = mul(viewProj, Out.position);
-	Out.normal = mul(worldMatrix,In.normal);
+	Out.worldPos = mul(worldMatrix,In.position);
+	Out.position = mul(viewProj, Out.worldPos);
+	Out.normal = mul(worldMatrixNormal,In.normal);
 	Out.texcoord = In.texcoord;
 	return Out;
 }
@@ -31,23 +33,37 @@ struct PsOut {
 	float4 color: SV_Target0;
 };
 
-struct LightNode {
-	float3 Position;
-	float  Intensity;
-	float3 Color;
-	float  NotUsed; //i don't know if we need to set the struct size of 4's intenger times.
-};
-
-LightNode Lights[2]; 
-
 Texture2D LightMap;
 
 SamplerState fliter;
 float4 color;
 
+TextureCube shadowMap;
+SamplerState shadowFilter;
+float4 vMoveLightColor;
+float4 vMoveLightPos;
+float2 nf;
+float denisty;
+
 PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
 	PsOut Out;
 	Out.color.rgb = LightMap.Sample(fliter,In.texcoord).rgb + float3(0.1,0.1,0.1);
+	//Out.color.rgb = 0;
 	Out.color.a = 1;
+
+	float4 shadowCoord = In.worldPos - vMoveLightPos;		
+	float4 vMoveLightDir = normalize(-shadowCoord);
+	float3 dist3 = In.worldPos - vMoveLightPos;
+	float dist = 1/dot(dist3,dist3);
+	float shadow = 0;
+	float sMax = max(max(abs(shadowCoord.x), abs(shadowCoord.y)), abs(shadowCoord.z));
+	float z = (1.0 / sMax) * nf.x + nf.y;
+	//shadow = shadowMap.SampleCmpLevelZero(shadowFilter, shadowCoord, z).x;
+	float r = shadowMap.Sample(shadowFilter, shadowCoord).r;
+	if(r > z * (0.999)){
+		shadow = 1;
+	}
+	Out.color.rgb = Out.color.rgb + saturate(dot((float3)vMoveLightDir,In.normal)) * shadow * vMoveLightColor * dist * denisty;
+	//Out.color.rgb = In.normal;
 	return Out;
 }

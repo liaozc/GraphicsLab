@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="examples.cpp" />
+    <ClCompile Include="App.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="examples.h" />
+    <ClInclude Include="App.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="plain_color.shd" />

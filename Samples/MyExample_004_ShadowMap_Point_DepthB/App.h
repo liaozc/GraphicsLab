@@ -1,11 +1,6 @@
 #ifndef _SHADOW_MAP_APP_H
 #define _SHADOW_MAP_APP_H
 
-/*
-	since (and why) i can't create a FORMAT_D16 buffer for depth,
-
-*/
-
 #include "../Framework3/Direct3D11/D3D11App.h"
 
 class Model;

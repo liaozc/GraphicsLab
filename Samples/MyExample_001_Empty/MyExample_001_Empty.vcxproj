@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="emptyApp.cpp" />
+    <ClCompile Include="App.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="emptyApp.h" />
+    <ClInclude Include="App.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6829AB14-2678-4380-9698-9599F3FA0514}</ProjectGuid>

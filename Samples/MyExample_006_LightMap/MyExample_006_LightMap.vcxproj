@@ -27,6 +27,8 @@
   <ItemGroup>
     <None Include="light_lm.shd" />
     <None Include="plain_light.shd" />
+    <None Include="plain_texture.shd" />
+    <None Include="shadow_gs.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{620AE3E6-C3ED-4DB5-A983-17E44FC77AD5}</ProjectGuid>
