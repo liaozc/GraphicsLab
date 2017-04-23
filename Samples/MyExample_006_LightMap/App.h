@@ -24,10 +24,12 @@ public:
 	void exit();
 	bool load();
 	void updateFrame();
+	bool onKey(const uint key, const bool pressed);
 protected:
 	Model* createCube();
 	void preComputeLightMap();
 	void computFace(const vec3& v0, const vec3& v1, const vec3& v2,const vec2& t0, const vec2& t2,uint8* lm, int width);
+	void blurLightMap(uint8* lm, int width, int height);
 	//the scene objs
 	VertexBufferID m_quad_vb;
 	IndexBufferID m_quad_ib;
@@ -57,6 +59,7 @@ protected:
 
 	uint m_lm_width;
 	uint m_lm_height;
+	SamplerStateID m_light_map_ssid;
 	TextureID m_lm0_id;
 	TextureID m_lm1_id;
 	TextureID m_lm2_id;
@@ -77,6 +80,9 @@ protected:
 	
 	float m_ratio;
 	float m_width;
+
+	float m_camera_angel;
+	float m_camera_dist;
 };
 
 

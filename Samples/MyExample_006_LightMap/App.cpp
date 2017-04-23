@@ -24,6 +24,8 @@ BaseApp *app = new LightMapApp();
 bool LightMapApp::init()
 {
 	initWorkDir();
+	m_camera_angel = 0;
+	m_camera_dist = 150;
 	return true;
 }
 
@@ -99,13 +101,14 @@ bool LightMapApp::load()
 	m_ratio = float(rect.bottom - rect.top) / float(rect.right - rect.left);
 	m_width = float(rect.right - rect.left);
 
-#if 0
+#if 1
 	preComputeLightMap();
 #endif
-	m_lm0_id = renderer->addTexture(ShaderDir("/LightMap0.dds"), 1, SS_NONE);
-	m_lm1_id = renderer->addTexture(ShaderDir("/LightMap1.dds"), 1, SS_NONE);
-	m_lm2_id = renderer->addTexture(ShaderDir("/LightMap2.dds"), 1, SS_NONE);
-	m_lm_ground_id = renderer->addTexture(ShaderDir("/LightMap_ground.dds"), 1, SS_NONE);
+	m_light_map_ssid = renderer->addSamplerState(BILINEAR, CLAMP, CLAMP, CLAMP);
+	m_lm0_id = renderer->addTexture(ShaderDir("/LightMap0.dds"), 1, m_light_map_ssid);
+	m_lm1_id = renderer->addTexture(ShaderDir("/LightMap1.dds"), 1, m_light_map_ssid);
+	m_lm2_id = renderer->addTexture(ShaderDir("/LightMap2.dds"), 1, m_light_map_ssid);
+	m_lm_ground_id = renderer->addTexture(ShaderDir("/LightMap_ground.dds"), 1, m_light_map_ssid);
 	
 	m_sphere = new Model();
 	m_sphere->createSphere(2);
@@ -229,10 +232,10 @@ Model* LightMapApp::createCube()
 	{
 		TextureRectangle* rect = texPacker.getRectangle(index);
 
-		float x0 = float(rect->x + 1 + 0.5f) / m_lm_width;
-		float y0 = float(rect->y + 1 + 0.5f) / m_lm_height;
-		float x1 = float(rect->x + rect->width - 1 - 0.5f) / m_lm_width;
-		float y1 = float(rect->y + rect->height - 1 - 0.5f) / m_lm_height;
+		float x0 = float(rect->x + 1.5f) / m_lm_width;
+		float y0 = float(rect->y + 1.5f) / m_lm_height;
+		float x1 = float(rect->x + rect->width - 1.5f) / m_lm_width;
+		float y1 = float(rect->y + rect->height - 1.5f) / m_lm_height;
 
 		lmCoords[4 * index + 0] = float2(x0, y0);
 		lmCoords[4 * index + 1] = float2(x1, y0);
@@ -257,10 +260,10 @@ Model* LightMapApp::createCube()
 
 void LightMapApp::computFace(const vec3& v0, const vec3& v1, const vec3& v2, const vec2& t0, const vec2& t2, uint8* lm,int width)
 {
-	int left = (int)t0.x;
-	int right = (int)t2.x;
-	int top = (int)t0.y;
-	int bottom = (int)t2.y;
+	int left = (int)(t0.x + 0.5f);
+	int right = (int)(t2.x + 0.5f);
+	int top = (int)(t0.y + 0.5f);
+	int bottom = (int)(t2.y + 0.5f);
 	float divX = 1.0f / (right - left);
 	float divY = 1.0f / (bottom - top);
 	float3 dirS = v1 - v0;
@@ -288,6 +291,30 @@ void LightMapApp::computFace(const vec3& v0, const vec3& v1, const vec3& v2, con
 				lm[3 * (j * width + i)] = (uint8)(col.x > 255 ? 255 : col.x);
 				lm[3 * (j * width + i) + 1] = (uint8)(col.y > 255 ? 255 : col.y);
 				lm[3 * (j * width + i) + 2] = (uint8)(col.z > 255 ? 255 : col.z);
+			}
+		}
+	}
+}
+
+void LightMapApp::blurLightMap(uint8 * lm, int width, int height)
+{
+	for (int j = 0; j < height; ++j) {
+		for (int i = 0; i < width; ++i) {
+			int left = i - 1;
+			left = left < 0 ? 0 : left;
+			int right = i + 1;
+			right = right >= width ? width - 1 : right;
+			int top = j - 1;
+			top = top < 0 ? 0 : top;
+			int bottom = j + 1;
+			bottom = bottom >= height ? height - 1 : bottom;
+			for (int c = 0; c < 3; ++c) {
+				int vCenter = lm[(j * width + i) * 3 + c];
+				int vLeft = lm[(j * width + left) * 3 + c];
+				int vRight = lm[(j * width + right) * 3 + c];
+				int vTop = lm[(top * width + i) * 3 + c];
+				int vBottom = lm[(bottom * width + i) * 3 + c];
+				lm[(j * width + i) * 3 + c] = ((vLeft + vRight + vTop + vBottom) >> 2);
 			}
 		}
 	}
@@ -347,9 +374,11 @@ void LightMapApp::preComputeLightMap()
 			v2 = (world * vec4(v2, 1)).xyz();
 			t0 = texcoords[texIndices[index]] * float2(m_lm_width, m_lm_height) + float2(-1, -1);
 			t2 = texcoords[texIndices[index + 2]] * float2(m_lm_width, m_lm_height) + float2(1, 1);
-			computFace(v0, v1, v2, t0, t2, lm,m_lm_width);
+
+			computFace(v0, v1, v2, t0, t2, lm, m_lm_width);
 			index += 6;
 		}
+		blurLightMap(lm, m_lm_width, m_lm_height);
 		Image image;
 		image.loadFromMemory(lm, FORMAT_RGB8, m_lm_width, m_lm_height, 1, 1, false);
 		char fileName[256];
@@ -369,6 +398,7 @@ void LightMapApp::preComputeLightMap()
 	t0 = float2(0,0);
 	t2 = float2(512, 512);
 	computFace(v0, v1, v2, t0, t2, lm2,512);
+	blurLightMap(lm2, 512, 512);
 	Image image;
 	image.loadFromMemory(lm2, FORMAT_RGB8, 512, 512, 1, 1, true);
 	char fileName[256];
@@ -389,6 +419,26 @@ void LightMapApp::updateFrame()
 
 
 	m_move_light = rotateY(/*PI * 1.18f*/time) * translate(20, 15, 0);
+}
+
+bool LightMapApp::onKey(const uint key, const bool pressed)
+{
+	if (D3D11App::onKey(key, pressed))
+		return true;
+	if (key == KEY_LEFT) {
+		m_camera_angel += 0.1f;
+	}
+	else if (key == KEY_RIGHT) {
+		m_camera_angel -= 0.1f;
+	}
+	else if (key == KEY_UP) {
+		m_camera_dist += 5;
+	}
+	else if (key == KEY_DOWN) {
+		m_camera_dist -= 5;
+	}
+
+	return true;
 }
 
 void LightMapApp::drawFrame()
@@ -430,9 +480,10 @@ void LightMapApp::drawFrame()
 	float col[4] = { 0.5f,0.5f,0.5f,1 };
 	renderer->clear(true, true, col, 1.0f);
 
-	vec3 eye(0, 200,0);
+	vec3 eye(0, m_camera_dist,-m_camera_dist);
+	eye = (rotateY(m_camera_angel) * vec4(eye,1)).xyz();
 	vec3 lookAt(0,0,0);
-	vec3 up(0, 0, 1);
+	vec3 up(0, 1, 0);
 	mat4 view = makeViewMatrixD3D(eye, lookAt, up);
 	mat4 proj = perspectiveMatrix(PI/12, m_ratio, 1, 250);
 	mat4 viewProj = proj * view;
@@ -442,7 +493,8 @@ void LightMapApp::drawFrame()
 	renderer->setShader(m_light_lm_shd);
 	renderer->setShaderConstant4x4f("viewProj", viewProj);
 	renderer->setTexture("shadowMap", m_shadow_map_id);
-	renderer->setSamplerState("shadowMapfliter", m_shadow_map_ssid);;
+	renderer->setSamplerState("shadowFilter", m_shadow_map_ssid);
+	renderer->setSamplerState("fliter", m_light_map_ssid);
 	renderer->setShaderConstant4f("vMoveLightColor", vec4(vLightColor,1));
 	renderer->setShaderConstant4f("vMoveLightPos", vec4(vLightPos,1));
 	renderer->setShaderConstant2f("nf", float2(zFar * zNear / (zNear - zFar), zFar / (zFar - zNear)));

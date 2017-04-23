@@ -35,11 +35,12 @@ struct PsOut {
 
 Texture2D LightMap;
 
+TextureCube shadowMap;
+SamplerState shadowFilter;
+
 SamplerState fliter;
 float4 color;
 
-TextureCube shadowMap;
-SamplerState shadowFilter;
 float4 vMoveLightColor;
 float4 vMoveLightPos;
 float2 nf;
