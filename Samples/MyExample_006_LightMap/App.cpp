@@ -561,7 +561,7 @@ void LightMapApp::drawFrame()
 	renderer->setShader(m_light_lm_shd);
 	renderer->setShaderConstant4x4f("viewProj", viewProj);
 	renderer->setTexture("shadowMap", m_shadow_map_id);
-	renderer->setSamplerState("shadowFilter", m_shadow_map_ssid);
+	renderer->setSamplerState("shadowFilter", m_light_map_ssid);
 	renderer->setSamplerState("fliter", m_light_map_ssid);
 	renderer->setShaderConstant4f("vMoveLightColor", vec4(vLightColor,1));
 	renderer->setShaderConstant4f("vMoveLightPos", vec4(vLightPos,1));
@@ -589,6 +589,7 @@ void LightMapApp::drawFrame()
 	
 	renderer->setShaderConstant4x4f("worldMatrix", identity4());
 	renderer->setTexture("LightMap", m_lm_ground_id);
+	renderer->setShaderConstant4x4f("worldMatrixNormal", identity4());
 	renderer->apply();
 	renderer->changeVertexFormat(m_quad_vf);
 	renderer->changeVertexBuffer(0, m_quad_vb);

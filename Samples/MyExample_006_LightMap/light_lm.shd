@@ -60,11 +60,12 @@ PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
 	float sMax = max(max(abs(shadowCoord.x), abs(shadowCoord.y)), abs(shadowCoord.z));
 	float z = (1.0 / sMax) * nf.x + nf.y;
 	//shadow = shadowMap.SampleCmpLevelZero(shadowFilter, shadowCoord, z).x;
-	float r = shadowMap.Sample(shadowFilter, shadowCoord).r;
+	float r = shadowMap.Sample(shadowFilter, shadowCoord);
+	float3 rgb = shadowMap.Sample(shadowFilter, shadowCoord);
 	if(r > z * (0.999)){
 		shadow = 1;
 	}
 	Out.color.rgb = Out.color.rgb + saturate(dot((float3)vMoveLightDir,In.normal)) * shadow * vMoveLightColor * dist * denisty;
-	//Out.color.rgb = In.normal;
+	//Out.color.rgb = rgb;
 	return Out;
 }
