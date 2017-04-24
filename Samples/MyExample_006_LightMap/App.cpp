@@ -101,14 +101,14 @@ bool LightMapApp::load()
 	m_ratio = float(rect.bottom - rect.top) / float(rect.right - rect.left);
 	m_width = float(rect.right - rect.left);
 
-#if 1
+#if 0
 	preComputeLightMap();
 #endif
 	m_light_map_ssid = renderer->addSamplerState(BILINEAR, CLAMP, CLAMP, CLAMP);
-	m_lm0_id = renderer->addTexture(ShaderDir("/LightMap0.dds"), 1, m_light_map_ssid);
-	m_lm1_id = renderer->addTexture(ShaderDir("/LightMap1.dds"), 1, m_light_map_ssid);
-	m_lm2_id = renderer->addTexture(ShaderDir("/LightMap2.dds"), 1, m_light_map_ssid);
-	m_lm_ground_id = renderer->addTexture(ShaderDir("/LightMap_ground.dds"), 1, m_light_map_ssid);
+	m_lm0_id = renderer->addTexture(ShaderDir("/LightMap0.dds"), false, m_light_map_ssid);
+	m_lm1_id = renderer->addTexture(ShaderDir("/LightMap1.dds"), false, m_light_map_ssid);
+	m_lm2_id = renderer->addTexture(ShaderDir("/LightMap2.dds"), false, m_light_map_ssid);
+	m_lm_ground_id = renderer->addTexture(ShaderDir("/LightMap_ground.dds"), false, m_light_map_ssid);
 	
 	m_sphere = new Model();
 	m_sphere->createSphere(2);
@@ -232,10 +232,10 @@ Model* LightMapApp::createCube()
 	{
 		TextureRectangle* rect = texPacker.getRectangle(index);
 
-		float x0 = float(rect->x + 1.5f) / m_lm_width;
-		float y0 = float(rect->y + 1.5f) / m_lm_height;
-		float x1 = float(rect->x + rect->width - 1.5f) / m_lm_width;
-		float y1 = float(rect->y + rect->height - 1.5f) / m_lm_height;
+		float x0 = float(rect->x + 1) / m_lm_width;
+		float y0 = float(rect->y + 1) / m_lm_height;
+		float x1 = float(rect->x + rect->width - 1) / m_lm_width;
+		float y1 = float(rect->y + rect->height - 1) / m_lm_height;
 
 		lmCoords[4 * index + 0] = float2(x0, y0);
 		lmCoords[4 * index + 1] = float2(x1, y0);
@@ -258,12 +258,17 @@ Model* LightMapApp::createCube()
 	return cube;
 }
 
-void LightMapApp::computFace(const vec3& v0, const vec3& v1, const vec3& v2, const vec2& t0, const vec2& t2, uint8* lm,int width)
+void LightMapApp::computFace(const vec3& v0, const vec3& v1, const vec3& v2, const vec2& t0, const vec2& t2, uint8* lm,int width,int height)
 {
-	int left = (int)(t0.x + 0.5f);
-	int right = (int)(t2.x + 0.5f);
-	int top = (int)(t0.y + 0.5f);
-	int bottom = (int)(t2.y + 0.5f);
+	int left = (int)(t0.x);
+	int right = (int)(t2.x);
+	int top = (int)(t0.y);
+	int bottom = (int)(t2.y);
+	if (left < 0 || right > width || top < 0 || top > height) {
+		ErrorMsg("computeFace: check the texcoord of light map");
+		return;
+	}
+
 	float divX = 1.0f / (right - left);
 	float divY = 1.0f / (bottom - top);
 	float3 dirS = v1 - v0;
@@ -293,6 +298,69 @@ void LightMapApp::computFace(const vec3& v0, const vec3& v1, const vec3& v2, con
 				lm[3 * (j * width + i) + 2] = (uint8)(col.z > 255 ? 255 : col.z);
 			}
 		}
+	}
+}
+
+void LightMapApp::fillBorder(const vec2 & t0, const vec2 & t2, uint8 * lm, int width,int height)
+{
+	int left = (int)(t0.x) - 1;
+	int right = (int)(t2.x);
+	int top = (int)(t0.y) - 1;
+	int bottom = (int)(t2.y);
+	if (left >= 0) {//copy left
+		int row = min(bottom, height);
+		for (int i = top + 1; i < row; ++i) {
+			int c = 3 * (i * width + left);
+			lm[c] = lm[c + 3];
+			lm[c + 1] = lm[c + 3 + 1];
+			lm[c + 2] = lm[c + 3 + 2];
+		}
+	}
+	if (right < width) {//copy right
+		int row = min(bottom, height);
+		for (int i = top + 1; i < row; ++i) {
+			int c = 3 * (i * width + right);
+			lm[c] = lm[c - 3];
+			lm[c + 1] = lm[c - 3 + 1];
+			lm[c + 2] = lm[c - 3 + 2];
+		}
+	}
+	if (top >= 0) {//copy top
+		int DstAdd = 3 * (top * width + t0.x);
+		int SrcAdd = 3 * (((int)t0.y) * width + t0.x);
+		memcpy(lm + DstAdd, lm + SrcAdd, (int(t2.x) - int(t0.x)) * 3);
+	}
+
+	if (bottom < height) {//copy bottom
+		int DstAdd = 3 * (bottom * width + t0.x);
+		int SrcAdd = 3 * (((int)t2.y - 1) * width + t0.x);
+		memcpy(lm + DstAdd, lm + SrcAdd, (int(t2.x) - int(t0.x)) * 3);
+	}
+	if (left >= 0 && top >= 0) {
+		int c = (top * width + left) * 3;
+		lm[c] = lm[c + 3];
+		lm[c + 1] = lm[c + 3 + 1];
+		lm[c + 2] = lm[c + 3 + 2];
+	}
+	if (right < width && top >= 0) {
+		int c = (top * width + right) * 3;
+		lm[c] = lm[c - 3];
+		lm[c + 1] = lm[c - 3 + 1];
+		lm[c + 2] = lm[c - 3 + 2];
+	}
+
+	if (left >= 0 && bottom < height) {
+		int c = (bottom * width + left) * 3;
+		lm[c] = lm[c + 3];
+		lm[c + 1] = lm[c + 3 + 1];
+		lm[c + 2] = lm[c + 3 + 2];
+	}
+
+	if (right < width && bottom < height) {
+		int c = (bottom * width + right) * 3;
+		lm[c] = lm[c - 3];
+		lm[c + 1] = lm[c - 3 + 1];
+		lm[c + 2] = lm[c - 3 + 2];
 	}
 }
 
@@ -372,10 +440,10 @@ void LightMapApp::preComputeLightMap()
 			v0 = (world * vec4(v0, 1)).xyz();
 			v1 = (world * vec4(v1, 1)).xyz();
 			v2 = (world * vec4(v2, 1)).xyz();
-			t0 = texcoords[texIndices[index]] * float2(m_lm_width, m_lm_height) + float2(-1, -1);
-			t2 = texcoords[texIndices[index + 2]] * float2(m_lm_width, m_lm_height) + float2(1, 1);
-
-			computFace(v0, v1, v2, t0, t2, lm, m_lm_width);
+			t0 = texcoords[texIndices[index]] * float2(m_lm_width, m_lm_height);
+			t2 = texcoords[texIndices[index + 2]] * float2(m_lm_width, m_lm_height);
+			computFace(v0, v1, v2, t0, t2, lm, m_lm_width, m_lm_height);
+			fillBorder(t0, t2, lm, m_lm_width, m_lm_height);
 			index += 6;
 		}
 		blurLightMap(lm, m_lm_width, m_lm_height);
@@ -397,7 +465,7 @@ void LightMapApp::preComputeLightMap()
 	v2 = vec3(30, 0, -30);
 	t0 = float2(0,0);
 	t2 = float2(512, 512);
-	computFace(v0, v1, v2, t0, t2, lm2,512);
+	computFace(v0, v1, v2, t0, t2, lm2,512,512);
 	blurLightMap(lm2, 512, 512);
 	Image image;
 	image.loadFromMemory(lm2, FORMAT_RGB8, 512, 512, 1, 1, true);

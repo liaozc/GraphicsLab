@@ -28,7 +28,8 @@ public:
 protected:
 	Model* createCube();
 	void preComputeLightMap();
-	void computFace(const vec3& v0, const vec3& v1, const vec3& v2,const vec2& t0, const vec2& t2,uint8* lm, int width);
+	void computFace(const vec3& v0, const vec3& v1, const vec3& v2,const vec2& t0, const vec2& t2,uint8* lm, int width,int height);
+	void fillBorder(const vec2& t0, const vec2& t2, uint8* lm, int width,int height);
 	void blurLightMap(uint8* lm, int width, int height);
 	//the scene objs
 	VertexBufferID m_quad_vb;
