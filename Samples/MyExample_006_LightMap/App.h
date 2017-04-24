@@ -66,6 +66,11 @@ protected:
 	TextureID m_lm2_id;
 	TextureID m_lm_ground_id;
 
+	TextureID m_ground_normal_id;
+	TextureID m_ground_tex_id;
+	ShaderID m_ground_shd;
+	SamplerStateID m_ground_ssid;
+
 	BSP m_bsp;
 
 	BlendStateID m_light_blend;

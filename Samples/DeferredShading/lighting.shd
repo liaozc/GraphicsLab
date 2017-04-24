@@ -79,7 +79,7 @@ bool getScreenBox(const float3 pos, const float radius, out float lp, out float 
 		float x1 = saturate(0.5 - N1 * ex);
 
 		float Pz0 = (Lxz - radiusSqr) / (lightPos.z - lightPos.x * N0);
-		float Pz1 = (Lxz - radiusSqr) / (lightPos.z - lightPos.x * N1);
+		float Pz1 = (Lxz - radiusSqr) / (lightPos.z - lightPos.x * N1); 
 
 		float Px0 = -Pz0 * N0;
 		float Px1 = -Pz1 * N1;

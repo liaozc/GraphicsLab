@@ -9,6 +9,8 @@ struct DrawVert
 {
 	vec3 pos;
 	vec3 normal;
+	vec3 tangent;
+	vec3 binormal;
 	vec2 tex;
 };
 
@@ -37,15 +39,16 @@ void LightMapApp::exit()
 
 bool LightMapApp::load()
 {
-	m_light_lm_shd = renderer->addShader(ShaderDir("/light_lm.shd"));
+	m_light_lm_shd = renderer->addShader(ShaderDir("/light_lm_sm.shd"));
 	m_plain_light_shd = renderer->addShader(ShaderDir("/plain_light.shd"));
+	m_ground_shd = renderer->addShader(ShaderDir("/light_lm_sm_tex_normal.shd"));
 
 	//create the ground
 	DrawVert quad[] = {
-		{vec3(-30,0,30),vec3(0,1,0),vec2(0,0)},
-		{ vec3(-30,0,-30),vec3(0,1,0),vec2(0,1) },
-		{ vec3(30,0,-30),vec3(0,1,0) ,vec2(1,1) },
-		{ vec3(30,0,30),vec3(0,1,0) ,vec2(1,0) },
+		{vec3(-30,0,30),vec3(0,1,0),vec3(0,0,1),vec3(1,0,0),vec2(0,0)},
+		{ vec3(-30,0,-30),vec3(0,1,0),vec3(0,0,1),vec3(1,0,0),vec2(0,1) },
+		{ vec3(30,0,-30),vec3(0,1,0) ,vec3(0,0,1),vec3(1,0,0),vec2(1,1) },
+		{ vec3(30,0,30),vec3(0,1,0) ,vec3(0,0,1),vec3(1,0,0),vec2(1,0) },
 	};
 	ushort indices[] = {
 		0,2,1,
@@ -57,9 +60,11 @@ bool LightMapApp::load()
 	FormatDesc vfdesc[] = {
 		{ 0,TYPE_VERTEX,FORMAT_FLOAT,3 },
 		{ 0,TYPE_NORMAL,FORMAT_FLOAT,3 },
+		{ 0,TYPE_TANGENT,FORMAT_FLOAT,3 },
+		{ 0,TYPE_BINORMAL,FORMAT_FLOAT,3 },
 		{ 0,TYPE_TEXCOORD,FORMAT_FLOAT,2 },
 	};
-	m_quad_vf = renderer->addVertexFormat(vfdesc, sizeof(vfdesc)/sizeof(FormatDesc), m_light_lm_shd);
+	m_quad_vf = renderer->addVertexFormat(vfdesc, sizeof(vfdesc)/sizeof(FormatDesc), m_ground_shd);
 
 	m_cube = createCube();
 	
@@ -120,6 +125,10 @@ bool LightMapApp::load()
 	m_shadow_map_ssid = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP, 0.0f, 1, LESS);
 	m_shadow_map_id = renderer->addRenderDepth(256, 256, 1, FORMAT_D32F, 1, m_shadow_map_ssid, CUBEMAP | SAMPLE_DEPTH);
 	m_shadow_map_gs_shd = renderer->addShader(ShaderDir("/shadow_gs.shd"));
+
+	m_ground_ssid = renderer->addSamplerState(TRILINEAR_ANISO, WRAP, WRAP, WRAP);
+	m_ground_tex_id = renderer->addTexture(ResDir("/Textures/FieldStone.dds"), true, m_ground_ssid);
+	 m_ground_normal_id = renderer->addNormalMap(ResDir("/Textures/FieldStoneBump.dds"), FORMAT_RGBA8, true, m_ground_ssid);
 
 	//for show cube map
 	m_plain_texture_shd = renderer->addShader(ShaderDir("/plain_texture.shd"));
@@ -587,8 +596,20 @@ void LightMapApp::drawFrame()
 	renderer->apply();
 	m_cube->draw(renderer);
 	
+	renderer->setShader(m_ground_shd);
+	renderer->setShaderConstant4x4f("viewProj", viewProj);
+	renderer->setTexture("shadowMap", m_shadow_map_id);
+	renderer->setSamplerState("shadowFilter", m_light_map_ssid);
+	renderer->setSamplerState("lightMapfliter", m_light_map_ssid);
+	renderer->setSamplerState("fliter", m_ground_ssid);
+	renderer->setShaderConstant4f("vMoveLightColor", vec4(vLightColor, 1));
+	renderer->setShaderConstant4f("vMoveLightPos", vec4(vLightPos, 1));
+	renderer->setShaderConstant2f("nf", float2(zFar * zNear / (zNear - zFar), zFar / (zFar - zNear)));
+	renderer->setShaderConstant1f("denisty", 50);
 	renderer->setShaderConstant4x4f("worldMatrix", identity4());
 	renderer->setTexture("LightMap", m_lm_ground_id);
+	renderer->setTexture("tex", m_ground_tex_id);
+	renderer->setTexture("normal", m_ground_normal_id);
 	renderer->setShaderConstant4x4f("worldMatrixNormal", identity4());
 	renderer->apply();
 	renderer->changeVertexFormat(m_quad_vf);

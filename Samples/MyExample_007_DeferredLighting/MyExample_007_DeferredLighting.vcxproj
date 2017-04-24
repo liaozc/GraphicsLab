@@ -24,21 +24,12 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="light_lm_sm.shd" />
-    <None Include="light_lm_sm_tex_normal.shd" />
-    <None Include="plain_light.shd" />
-    <None Include="plain_texture.shd" />
-    <None Include="shadow_gs.shd" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="readme.txt" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{620AE3E6-C3ED-4DB5-A983-17E44FC77AD5}</ProjectGuid>
+    <ProjectGuid>{154F8927-8BFB-4134-A72C-5D0CED906781}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MyExample_001_Empty</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>MyExample_007_DefferedLighting</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
