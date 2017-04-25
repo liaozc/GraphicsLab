@@ -1,0 +1,93 @@
+
+struct PsIn
+{
+	float4 position : SV_Position;
+	float4 texCoord : TexCoord;
+	float3 normal   : Normal;
+};
+
+[Vertex shader]
+
+Texture2D Terrain;
+SamplerState VSFilter;
+
+float4x4 ViewProj;
+
+PsIn main(uint VertexID : SV_VertexID, uint InstanceID : SV_InstanceID)
+{
+	PsIn Out;
+
+	float4 position;
+
+	int2 tc;
+	tc.x = VertexID & 0xFE;
+	tc.y = (VertexID & 0x1) + InstanceID;
+
+	const float pixel_size = 1.0f / 256.0f;
+	const float half_pixel_size = 0.5f * pixel_size;
+
+	float2 texCoord = tc * pixel_size + half_pixel_size;
+
+	// Sample heightmap
+	float h = Terrain.SampleLevel(VSFilter, texCoord, 0).x;
+
+	// Sample neighbor heights to compute a normal
+	float h00 = Terrain.SampleLevel(VSFilter, texCoord + float2(-half_pixel_size, -half_pixel_size), 0).x;
+	float h01 = Terrain.SampleLevel(VSFilter, texCoord + float2(-half_pixel_size,  half_pixel_size), 0).x;
+	float h10 = Terrain.SampleLevel(VSFilter, texCoord + float2( half_pixel_size, -half_pixel_size), 0).x;
+	float h11 = Terrain.SampleLevel(VSFilter, texCoord + float2( half_pixel_size,  half_pixel_size), 0).x;
+
+	float3 normal;
+	normal.x = (h11 - h00) + (h01 - h10);
+	normal.y = (50.0f / 256.0f) * 0.25f;
+	normal.z = (h11 - h00) - (h01 - h10);
+
+	Out.normal = normalize(normal);
+
+
+	float2 xz = (float2) tc.xy;
+
+	position.x = xz.x - 127.5f;
+	position.y = 50.0f * h;
+	position.z = xz.y - 127.5f;
+	position.w = 1.0f;
+
+	Out.position = mul(ViewProj, position);
+	Out.texCoord.xy = xz * (1.0f / 8.0f);
+	Out.texCoord.zw = tc.xy * (1.0f / 256.0f) + (0.5f / 256.0f);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D Ground0;
+Texture2D Ground1;
+SamplerState Filter;
+
+Texture2D Shadow;
+SamplerState ShadowFilter;
+
+static const float3 light_dir = normalize(float3(-0.79f, 0.39f, 0.47f));
+
+float4 main(PsIn In) : SV_Target
+{
+	float3 normal = normalize(In.normal);
+
+	// Diffuse lighting with some bias factors added to preserve a sense of lighting curvature in the shadows
+	float diffuse = saturate(dot(light_dir, normal)) + 0.1f;
+	diffuse *= (Shadow.Sample(ShadowFilter, In.texCoord.zw).x + 0.1f);
+
+	float3 color0 = Ground0.Sample(Filter, In.texCoord);
+	float3 color1 = Ground1.Sample(Filter, In.texCoord);
+	// Adjust texture colors a bit
+	color0.r *= 1.2f;
+	color1 *= 5.0f;
+
+	// Use green from grass texture as alpha since it doesn't have an alpha channel. Add it to the blend mask to get a more natural transition than plain fade.
+	float blend_mask = saturate(In.normal.y * 8.0f - 6.0f + color0.g);
+	float3 color = lerp(color1, color0, blend_mask);
+
+	return (diffuse + 0.02f) * float4(color, 1.0f);
+}

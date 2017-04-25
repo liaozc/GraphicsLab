@@ -1,0 +1,63 @@
+
+struct VsIn
+{
+	float3 Position : Position;
+	float3 Normal   : Normal;
+	float2 TexCoord : TexCoord;
+};
+
+struct PsIn
+{
+	float4 Position : SV_Position;
+	// When dealing with very thin geometry centroid sampling becomes essential in order to not introduce aliasing
+	centroid float2 TexCoord : TexCoord;
+	centroid float  Fade     : Fade;
+	centroid float  Light    : Light;
+};
+
+[Vertex shader]
+
+float4x4 ViewProj;
+float PixelScale;
+float Radius;
+
+static const float3 light_dir = normalize(float3(-0.79f, 0.39f, 0.47f));
+
+PsIn main(VsIn In)
+{
+	PsIn Out;
+
+	// Compute view-space w
+	float w = dot(ViewProj[3], float4(In.Position.xyz, 1.0f));
+
+	// Compute what radius a pixel wide wire would have
+	float pixel_radius = w * PixelScale;
+
+	// Clamp radius to pixel size. Fade out with the reduction in radius versus original.
+	float radius = max(Radius, pixel_radius);
+	float fade = Radius / radius;
+
+	// Compute final position
+	float3 position = In.Position + radius * In.Normal;
+
+	Out.Position = mul(ViewProj, float4(position, 1.0f));
+	Out.TexCoord.x = In.TexCoord.x * (0.02f / radius);
+	Out.TexCoord.y = In.TexCoord.y;
+	Out.Light = dot(light_dir, In.Normal) * 0.5f + 0.5f;
+	Out.Fade = fade;
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D Wire;
+SamplerState Filter;
+
+float4 main(PsIn In) : SV_Target
+{
+	float3 tex = Wire.Sample(Filter, In.TexCoord) * In.Light;
+
+	return float4(tex, In.Fade.x);
+}
