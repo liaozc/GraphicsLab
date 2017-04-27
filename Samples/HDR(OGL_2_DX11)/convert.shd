@@ -1,0 +1,50 @@
+
+
+struct VsIn {
+	float4 position : Position;
+};
+
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float2 texCoord0 : TEXCOORD0;
+	float2 texCoord1 : TEXCOORD1;
+	float2 texCoord2 : TEXCOORD2;
+	float2 texCoord3 : TEXCOORD3;
+};
+
+
+[Vertex shader]
+
+float2 halfPixel;
+
+PsIn main(VsIn In) {
+	PsIn Out;
+	Out.position = In.position;
+	Out.position.zw = float2(1,1);
+
+	float2 texCoord = In.position.xy * float2(0.5,-0.5) + 0.5;
+	Out.texCoord0 = texCoord + halfPixel * float2( 1,  1);
+	Out.texCoord1 = texCoord + halfPixel * float2(-1,  1);
+	Out.texCoord2 = texCoord + halfPixel * float2(-1, -1);
+	Out.texCoord3 = texCoord + halfPixel * float2( 1, -1);
+
+	return Out;
+}
+
+[Fragment shader]
+
+Texture2D Image;
+float invRange;
+SamplerState Fliter;
+
+
+float3 main(PsIn In) : SV_Target{
+	// Downscale and convert to fixed point
+	float3 base = Image.Sample(Fliter, In.texCoord0).rgb;
+	base     += Image.Sample(Fliter, In.texCoord1).rgb;
+	base     += Image.Sample(Fliter, In.texCoord2).rgb;
+	base     += Image.Sample(Fliter, In.texCoord3).rgb;
+	base *= invRange;
+	return base;
+}

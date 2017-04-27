@@ -1,0 +1,79 @@
+
+struct VsIn {
+	float4 position : Position;
+};
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float2 texCoord : TEXCOORD0;
+};
+
+[Vertex shader]
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = float4(In.position.xy,1,1);
+	Out.texCoord = In.position.xy * float2(0.5,-0.5) + 0.5;
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D Base;
+Texture2D Blur;
+SamplerState BaseFliter;
+SamplerState BlurFliter;
+float exposure;
+float range;
+float blurStrength;
+
+int varyHDR = 1;
+
+float3 F(float3 x)
+{
+	const float A = 0.22f;
+	const float B = 0.30f;
+	const float C = 0.10f;
+	const float D = 0.20f;
+	const float E = 0.01f;
+	const float F = 0.30f;
+ 
+	return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+}
+
+float3 main(PsIn In):SV_Target{
+	float4 base = Base.Sample(BaseFliter, In.texCoord);
+	float4 blur = Blur.Sample(BlurFliter, In.texCoord);
+	blur.rgb = pow(blur.rgb, float3(blurStrength,blurStrength,blurStrength));
+	blur *= range;
+	float4 color = base + blur;
+
+	float3 rgb = 0;
+	if(varyHDR == 0){//THE CLASSIC ONE
+		 const float MIDDLE_GREY = exposure * exposure * 2;
+		 rgb = color.rgb * MIDDLE_GREY / exposure;
+		 rgb = rgb / (1.0f + rgb);
+	}
+	
+	if(varyHDR == 1){//THE "CRUDE" ONE
+		 rgb = 1.0 - exp(-exposure * color.rgb);  
+	}
+	
+	if(varyHDR == 2){//THE FILMIC ONE
+		const float WHITE = 11.2f;
+		rgb = F(1.6f * exposure * color) / F(WHITE);
+	}
+
+	if(varyHDR == 3){//THE FAMOUS ACES
+		float A = 2.51f;
+		float B = 0.03f;
+		float C = 2.43f;
+		float D = 0.59f;
+		float E = 0.14f;
+		color *= exposure;
+		rgb =  (color.rgb * (A * color + B)) / (color.rgb * (C * color.rgb + D) + E);
+	}
+	
+	return rgb;
+}

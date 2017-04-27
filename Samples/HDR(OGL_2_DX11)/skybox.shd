@@ -1,0 +1,46 @@
+
+struct PsIn
+{
+	float4 position : SV_Position;
+	float3 cubeCoord : TexCoord;
+};
+
+[Vertex shader]
+
+float4x4 inv_mvp;
+
+PsIn main(uint VertexID : SV_VertexID)
+{
+	PsIn Out;
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0f : -1.0f;
+	position.y = (VertexID == 2)? 3.0f : -1.0f;
+	position.zw = 1.0f;
+
+	Out.position = position;
+	Out.cubeCoord = mul(inv_mvp, position);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+TextureCube RGB;
+TextureCube Exp;
+SamplerState Filter;
+
+float2 scaleBias;
+
+float3 main(PsIn In) : SV_Target
+{
+	float3 sky = RGB.Sample(Filter,In.cubeCoord).rgb;
+	float ex = Exp.Sample(Filter, In.cubeCoord).x;
+
+	// Expand RGBE
+	sky *= exp2(ex * scaleBias.x + scaleBias.y);
+
+	return sky;
+	
+}

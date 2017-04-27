@@ -10,6 +10,7 @@ struct PsIn
 {
 	float4 Position : SV_Position;
 	// When dealing with very thin geometry centroid sampling becomes essential in order to not introduce aliasing
+	//@ i turn off the centroid , nothing obvious happen.
 	centroid float2 TexCoord : TexCoord;
 	centroid float  Fade     : Fade;
 	centroid float  Light    : Light;

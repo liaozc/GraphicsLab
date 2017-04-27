@@ -1,0 +1,88 @@
+
+
+struct VsIn {
+	float4 position : Position;
+	float2 textureCoord: TexCoord0;
+	float3 tangent : Tangent;
+	float3 binormal : Binormal;
+	float3 normal : Normal;
+	float2 lightMapCoord:TexCoord1;
+
+};
+
+struct PSIn {
+	float4 position:  SV_Position;
+	float2 texCoord : TEXCOORD0;
+	float2 lmCoord : TEXCOORD1;
+	float3 lightVec : NORMAL;
+	float3 vVec : BINORMAL;
+};
+
+
+[Vertex shader]
+
+float3 lightDir;
+float3 camPos;
+float4x4 mvp;
+
+PSIn main(VsIn In){
+	PSIn Out;
+	Out.position = mul(mvp,In.position);;
+
+	Out.texCoord = In.textureCoord;
+	Out.lmCoord = In.lightMapCoord;
+
+	Out.lightVec.x = dot(lightDir, In.tangent);
+	Out.lightVec.y = dot(lightDir, In.binormal);
+	Out.lightVec.z = dot(lightDir, In.normal);
+
+	float3 viewVec = camPos - In.position.xyz;
+	Out.vVec.x = dot(viewVec,In.tangent);
+	Out.vVec.y = dot(viewVec,In.binormal);
+	Out.vVec.z = dot(viewVec,In.normal);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D Base;
+Texture2D Bump;
+SamplerState Fliter;
+
+Texture2D LightMap;
+SamplerState LMFliter;
+
+float2 plx;
+float gloss;
+
+static const float3 lightColor = float3(0.12, 0.14, 0.2);
+
+struct PsOut {
+	float3 col : SV_Target0;
+};
+
+float3 main(PSIn In) : SV_Target {
+	float3 viewVec = normalize(In.vVec);
+
+	float height = Bump.Sample(Fliter,In.texCoord).a;
+	float2 plxCoord = In.texCoord + (height * plx.x + plx.y) * viewVec.xy;
+
+	
+	float3 base = Base.Sample(Fliter,plxCoord).rgb;
+	float3 bump = Bump.Sample(Fliter,plxCoord).xyz;
+	float3 normal = normalize(bump * 2.0 - 1.0);
+
+	float diffuse = saturate(dot(In.lightVec, normal));
+	float specular = pow(saturate(dot(reflect(-viewVec, normal), In.lightVec)), 16.0);
+
+
+	float4 shadow = LightMap.Sample(LMFliter,In.lmCoord);
+
+	float3 rgb = lightColor * (shadow.x * (diffuse * base + gloss * specular) + 0.7 * shadow.w * base);
+	//rgb = shadow.rgb; -> lm is right!.
+	//rgb = lightColor; -> lightColor is right.
+	//rgb = gloss * specular; -> it seems right .so the model should not be the problem.
+	return rgb;
+}

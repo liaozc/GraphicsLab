@@ -1,0 +1,46 @@
+
+struct VsIn {
+	float4 position : Position;
+};
+
+struct PsIn {
+	float4 position :  SV_POSITION;
+	float2 texCoord0 : TEXCOORD0;
+	float2 texCoord1 : TEXCOORD1;
+	float2 texCoord2 : TEXCOORD2;
+	float2 texCoord3 : TEXCOORD3;
+};
+
+[Vertex shader]
+
+float2 sample0;
+float2 sample1;
+float2 sample2;
+float2 sample3;
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = float4(In.position.xy,1,1);
+	float2 texCoord = In.position.xy * float2(0.5,-0.5) + 0.5;
+	Out.texCoord0 = texCoord + sample0;
+	Out.texCoord1 = texCoord + sample1;
+	Out.texCoord2 = texCoord + sample2;
+	Out.texCoord3 = texCoord + sample3;
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D Image;
+SamplerState Fliter;
+
+float3 main(PsIn In) : SV_Target{
+	float3 base = Image.Sample(Fliter,In.texCoord0).rgb;
+	base     += Image.Sample(Fliter,In.texCoord1).rgb;
+	base     += Image.Sample(Fliter,In.texCoord2).rgb;
+	base     += Image.Sample(Fliter,In.texCoord3).rgb;
+
+	return 0.25 * base.rgb;
+}
