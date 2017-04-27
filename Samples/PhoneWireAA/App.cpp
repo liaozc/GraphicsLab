@@ -109,7 +109,7 @@ bool App::init()
 	speed = 50;
 
 	m_Pole = new Model();
-	if (!m_Pole->loadObj(ResDir("/Models/pole.obj"))) return false;
+	if (!m_Pole->loadObj(ResDir("/Models/pole.oobj"))) return false;
 
 	// Init GUI components
 	int tab = configDialog->addTab("Phone Wire AA");

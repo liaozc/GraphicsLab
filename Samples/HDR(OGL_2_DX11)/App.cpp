@@ -74,7 +74,7 @@ bool App::init(){
 	lightDir = normalize(vec3(-0.13f, 0.68f, 1));
 
 	map = new Model();
-	if (!map->loadObj(ResDir("/Models/Castle.obj"))) 
+	if (!map->loadObj(ResDir("/Models/Castle.oobj"))) 
 		return false;
 
 	map->computeTangentSpace(true);
