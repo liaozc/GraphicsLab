@@ -1,0 +1,58 @@
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float2 texcoord : TEXCOORD0;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID : SV_VertexID) {
+	PsIn Out;
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0f : -1.0f;
+	position.y = (VertexID == 2)? 3.0f : -1.0f;
+	position.zw = 1.0f;
+
+	Out.position = position;
+	Out.texcoord = position.xy * float2(0.5,-0.5) + 0.5;
+
+	return Out;
+}
+
+[Fragment shader]
+
+Texture2D ambient;
+Texture2D specular;
+Texture2D normal;
+Texture2D depth;
+SamplerState fliter;
+
+float3 camPos;
+float3 sunlightDir;
+float4x4 invMvp;
+
+float3 main(PsIn In):SV_Target {
+	float3 diffuse = ambient.Sample(fliter,In.texcoord);
+	float spec = specular.Sample(fliter,In.texcoord);
+	float3 n = normal.Sample(fliter, In.texcoord).rgb * 2.0 - 1.0;
+	float d = depth.Sample(fliter,In.texcoord).r;
+	if(1.0 - d < 0.0001)//too close to the far plane
+		discard;
+
+	// Clip-space position, except x and y scale-biased (the invMvp has this prebaked into it)
+	float4 cPos = float4(In.position.xy, d, 1);
+	// World-space position
+	float4 wPos = mul(invMvp, cPos);
+	float3 pos = wPos.xyz / wPos.w;
+
+	float3 viewVec = camPos - pos;
+	spec = pow(saturate(dot(reflect(-viewVec, n), sunlightDir)), spec);
+
+	diffuse = diffuse *  saturate(dot(sunlightDir, n));
+	
+	float3 rgb = n;
+
+	return rgb;
+
+}

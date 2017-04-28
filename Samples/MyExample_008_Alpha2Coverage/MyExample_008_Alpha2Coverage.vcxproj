@@ -25,10 +25,10 @@
     <ClInclude Include="App.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="alphaTweak.shd" />
+    <None Include="plain_texture.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2FF9A59D-4E65-4BFD-94F9-0DB367D143D3}</ProjectGuid>
+    <ProjectGuid>{94C41171-B55B-483B-9B17-18274DFB865C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MyExample_001_Empty</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>

@@ -10,10 +10,33 @@ class DeferredLightingApp : public D3D11App
 public:
 	char *getTitle() const { return "deferred lighting scene"; }
 	void drawFrame();
+	bool init();
+	bool load();
 protected:
-	//scene desc,just like the pre example(lightmap),we've got 3 cube and a Big Box ,
-	//which contains the cubes.and we has 100 animating lights,which will lit the scene.
+	
 	Model* m_cube;
+	mat4 m_cube0_mvp;
+	mat4 m_cube1_mvp;
+	mat4 m_cube2_mvp;
+
+	Model* m_sphere;	//i use this to be a light volume.
+
+	VertexBufferID m_ground_vb;
+	IndexBufferID m_ground_ib;
+	VertexFormatID m_ground_vf;
+	
+	TextureID m_ambient_buff, m_specular_buff, m_normal_buff,m_depth_buff;
+	
+	TextureID m_diffuse_id, m_specular_id, m_normal_id;
+
+
+	ShaderID m_fill_buff_shd;
+	ShaderID m_ambient_shd;
+
+	float m_ratio;
+
+	//TEST RESOURCE
+	TextureID m_test_tex;
 
 };
 

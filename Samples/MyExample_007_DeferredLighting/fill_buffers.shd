@@ -1,0 +1,60 @@
+
+struct VsIn {
+	float4 position: Position;
+	float3 normal : Normal;
+	float3 binormal : Binormal;
+	float3 tangent : Tangent;
+	float2 texcoord : Texcoord;
+};
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float3 normal : NORMAL;
+	float3 binormal : BINORMAL;
+	float3 tangent : TANGENT;
+	float2 texcoord : TEXCOOORD0;
+};
+
+[Vertex shader]
+
+float4x4 mvp;
+
+PsIn main(VsIn In) {
+	PsIn Out;
+	Out.position = mul(mvp,In.position);
+	Out.normal = In.normal;
+	Out.binormal = In.binormal;
+	Out.tangent = In.tangent;
+	Out.texcoord = In.texcoord;
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float3 ambient : SV_Target0;
+	float specular : SV_Target1;
+	float3 normal : SV_Target2;
+};
+
+Texture2D diffuse;
+Texture2D specular;
+Texture2D normal;
+SamplerState fliter;
+
+
+PsOut main(PsIn In) {
+	PsOut Out;
+	float3 diff = diffuse.Sample(fliter,In.texcoord).rgb;
+	float spec = specular.Sample(fliter,In.texcoord).r;
+	float3 bump = normal.Sample(fliter, In.texcoord).xyz * 2.0 - 1.0;
+
+	float3 n = In.tangent * bump.x + In.binormal * bump.y + In.normal * bump.z;
+	n = normalize(n);
+
+	Out.ambient = diff;
+	Out.specular = spec;
+	Out.normal = n;
+
+	return Out;
+}
