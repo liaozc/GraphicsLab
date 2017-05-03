@@ -1,0 +1,47 @@
+
+struct VsIn{
+	float4 pos : Position;
+	float3 normal : Normal;
+};
+
+struct PsIn {
+	float4 pos : SV_POSITION;
+	float4 worldPos : TEXCOORD0;
+	float3 normal : NORMAL;
+};
+
+[Vertex shader]
+
+float4x4 world;
+float4x4 viewProj;
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.worldPos = mul(world,In.pos);
+	Out.pos = mul(viewProj,Out.worldPos);
+	Out.normal = mul(world,In.normal);
+	return Out;
+} 
+
+[Fragment shader]
+
+float3 viewPos;
+float3 lightPos;
+float3 lightCol;
+float gross;
+float atten;
+float specdef;
+
+float3 main(PsIn In):SV_Target{
+	float3 col;
+	float3 lightDir = lightPos - In.worldPos;
+	float dist = dot(lightDir,lightDir);
+	lightDir = normalize(lightDir);
+	float ratten = atten / dist;
+	float diffuse = saturate(dot(lightDir,In.normal)) * lightCol *ratten ;
+	float3 viewVec = viewPos - In.worldPos;
+	float3 rview = normalize(reflect(-viewVec, In.normal));
+	float3 spec = pow(saturate(dot(rview, lightDir)), gross) * lightCol * ratten * specdef;
+	col = diffuse * 0.6 + spec * 0.4;
+	return col;
+}

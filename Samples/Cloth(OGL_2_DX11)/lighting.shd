@@ -1,0 +1,41 @@
+[Vertex shader]
+
+uniform vec3 lightPos;
+uniform vec3 camPos;
+
+varying vec2 texCoord;
+varying vec3 normal;
+varying vec3 lightVec;
+varying vec3 viewVec;
+
+void main(){
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	texCoord = gl_MultiTexCoord0.xy;
+	normal = gl_Normal;
+	lightVec = lightPos - gl_Vertex.xyz;
+	viewVec = camPos - gl_Vertex.xyz;
+}
+
+
+[Fragment shader]
+
+uniform sampler2D Base;
+
+varying vec2 texCoord;
+varying vec3 normal;
+varying vec3 lightVec;
+varying vec3 viewVec;
+
+void main(){
+	vec4 base = texture2D(Base, texCoord);
+
+	vec3 norm = normalize(normal);
+	vec3 lVec = normalize(lightVec);
+	vec3 vVec = normalize(viewVec);
+
+	float diffuse = saturate(dot(lVec, norm));
+	float specular = pow(saturate(dot(reflect(-vVec, norm), lVec)), 16.0);
+
+	gl_FragColor = (0.8 * diffuse + 0.15) * base + 0.4 * specular;
+}

@@ -593,7 +593,7 @@ TextureID Direct3D11Renderer::addTexture(Image &img, const SamplerStateID sample
 			}
 		}
 	}
-
+	//@: what is different between the follow format?
 	tex.texFormat = formats[format];
 	if (flags & SRGB)
 	{
@@ -2712,7 +2712,7 @@ ID3D11ShaderResourceView *Direct3D11Renderer::createSRV(ID3D11Resource *resource
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	ID3D11ShaderResourceView *srv;
-
+	//@ £ºwhat is the relationship between tex's array size and its sample count and srv's mutile samples ?
 	switch (type)
 	{
 		case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
@@ -2722,7 +2722,7 @@ ID3D11ShaderResourceView *Direct3D11Renderer::createSRV(ID3D11Resource *resource
 			srvDesc.Format = (format != DXGI_FORMAT_UNKNOWN)? format : desc1d.Format;
 			if (desc1d.ArraySize > 1)
 			{
-				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY; //@: why 2darray but not 1darray ?
 				srvDesc.Texture1DArray.FirstArraySlice = 0;
 				srvDesc.Texture1DArray.ArraySize = desc1d.ArraySize;
 				srvDesc.Texture1DArray.MostDetailedMip = 0;
