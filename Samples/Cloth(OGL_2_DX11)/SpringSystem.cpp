@@ -4,6 +4,14 @@ SpringSystem::SpringSystem(){
 	gravity = vec3(0, -70, 0);
 }
 
+SpringSystem::~SpringSystem()
+{
+	unsigned count = nodes.getCount();
+	for (unsigned i = 0; i < count; ++i)
+		delete nodes[i];
+	nodes.clear();
+}
+
 void SpringSystem::addRectField(unsigned int width, unsigned int height, void *pos, void *norm, unsigned int stride){
 	unsigned int i, j, k;
 	char *p = (char *) pos;

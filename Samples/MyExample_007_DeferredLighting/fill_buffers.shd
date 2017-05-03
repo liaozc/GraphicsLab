@@ -50,11 +50,11 @@ PsOut main(PsIn In) {
 	float3 bump = normal.Sample(fliter, In.texcoord).xyz * 2.0 - 1.0;
 
 	float3 n = In.tangent * bump.x + In.binormal * bump.y + In.normal * bump.z;
-	n = normalize(n);
+	n = normalize(bump);
 
 	Out.ambient = diff;
 	Out.specular = spec;
-	Out.normal = n;
+	Out.normal = bump;
 
 	return Out;
 }

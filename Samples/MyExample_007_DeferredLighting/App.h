@@ -32,6 +32,7 @@ protected:
 
 	ShaderID m_fill_buff_shd;
 	ShaderID m_ambient_shd;
+	ShaderID m_light_shd;
 
 	float m_ratio;
 

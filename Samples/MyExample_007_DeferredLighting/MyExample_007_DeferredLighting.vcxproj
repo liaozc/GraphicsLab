@@ -27,6 +27,7 @@
   <ItemGroup>
     <None Include="ambient.shd" />
     <None Include="fill_buffers.shd" />
+    <None Include="light.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{154F8927-8BFB-4134-A72C-5D0CED906781}</ProjectGuid>

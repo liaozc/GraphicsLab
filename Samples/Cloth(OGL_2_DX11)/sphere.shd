@@ -1,40 +1,44 @@
+
+struct VsIn {
+	float4 position : Position;
+	float3 normal : Normal;
+};
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float4 worldPos : BINORMAL;
+	float4 normal : NORMAL;
+};
+
 [Vertex shader]
 
-uniform vec3 lightPos;
-uniform vec3 camPos;
-uniform vec3 spherePos;
-uniform float sphereSize;
+float4x4 world;
+float4x4 viewProj;
 
-varying vec3 normal;
-varying vec3 lightVec;
-varying vec3 viewVec;
-
-void main(){
-	vec3 pos = gl_Vertex.xyz * sphereSize + spherePos;
-
-	gl_Position = gl_ModelViewProjectionMatrix * vec4(pos, 1.0);
-
-	normal = gl_Vertex.xyz;
-	lightVec = lightPos - pos;
-	viewVec = camPos - pos;
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.worldPos = mul(world,In.position);
+	Out.position = mul(viewProj,Out.worldPos); 
+	Out.normal =  mul(world,In.normal); 
+	return Out;
 }
-
 
 [Fragment shader]
 
-varying vec3 normal;
-varying vec3 lightVec;
-varying vec3 viewVec;
+float3 lightPos;
+float3 camPos;
 
-uniform vec4 color;
+float4 color;
 
-void main(){
-	vec3 norm = normalize(normal);
-	vec3 lVec = normalize(lightVec);
-	vec3 vVec = normalize(viewVec);
+float3 main(PsIn In) : SV_Target {
+	float3 norm = normalize(In.normal);
+	float3 lVec = normalize(lightPos - In.worldPos);
+	float3 vVec = normalize(camPos - In.worldPos);
 
 	float diffuse = saturate(dot(lVec, norm));
 	float specular = pow(saturate(dot(reflect(-vVec, norm), lVec)), 16.0);
 
-	gl_FragColor = (diffuse + 0.15) * color + 0.7 * specular;
+	float4 rgb = (diffuse + 0.15) * color + 0.7 * specular;
+	//rgb = diffuse;
+	return rgb.rgb;
 }

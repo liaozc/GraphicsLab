@@ -21,18 +21,19 @@ struct DrawVert
 	vec2 texCoord;
 };
 
-class ClothApp : D3D11App
+class ClothApp : public D3D11App
 {
 public:
-	void resetCamera();
+	char *getTitle() const { return "cloth app scene"; }
+
 	bool init();
 	void exit();
 
 	bool load();
 
-	void drawLight(const vec3 &lightPos);
-	void drawSphere(const vec3 &lightPos, const vec3 &spherePos, const float size, const vec3 &color);
-	void drawCloth(const vec3 &lightPos);
+	void drawLight(const vec3 &lightPos,float size, const vec3& camPos, const vec3& up, const mat4& viewProj);
+	void drawSphere(const vec3 &lightPos, const vec3 &spherePos, const float size, const vec3 &color, const mat4& viewProj, const vec3& camPos);
+	void drawCloth(const vec3 &lightPos, const mat4& viewProj, const vec3& camPos);
 
 	void drawFrame();
 
@@ -41,14 +42,31 @@ protected:
 	Model* m_sphere;
 	//i should use a vb,but the framework don't surpport to dynamic change it.
 	DrawVert m_flag_vertexs[CLOTH_SIZE_Y][CLOTH_SIZE_X];
-	unsigned short m_flag_inds[CLOTH_SIZE_X * 2];
 	
+	VertexBufferID m_flag_vb;
+	VertexFormatID m_flag_vf;
+	IndexBufferID m_flag_ib;
+
 	float nextTime;
 	unsigned int nSpheres;
 	vec3 m_spherePos[3];
 	float m_sphereSize[3];
 	vec3 m_sphereColor[3];
 
+	ShaderID m_lighting_shd;
+	ShaderID m_sphere_shd;
+	ShaderID m_billboard_shd;
+
+	TextureID m_base_id;
+	TextureID m_light_id;
+	BlendStateID m_light_blend;
+	VertexBufferID m_light_vb;
+	VertexFormatID m_light_vf;
+	IndexBufferID m_light_ib;
+
+	Array <TextureID> m_flags;
+
+	float m_ratio;
 };
 
 #endif

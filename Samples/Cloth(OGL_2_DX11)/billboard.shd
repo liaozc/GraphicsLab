@@ -1,0 +1,32 @@
+
+struct VsIn {
+	float4 position : Position;
+	float2 texcoord : Texcoord;
+};
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float2 texcoord : TEXCOORD0;
+};
+
+[Vertex shader]
+
+float4x4 viewProj;
+
+PsIn main(VsIn In)
+{
+	PsIn Out;
+	Out.position = mul(viewProj,In.position);
+	Out.texcoord = In.texcoord;
+	return Out;
+}
+
+[Fragment shader]
+
+Texture2D base;
+SamplerState filter;
+
+float3 main(PsIn In):SV_Target {
+	float3 rgb = base.Sample(filter,In.texcoord).rgb;
+	return rgb;
+}

@@ -1491,6 +1491,7 @@ IndexBufferID Direct3D10Renderer::addIndexBuffer(const uint nIndices, const uint
 	return indexBuffers.add(ib);
 }
 
+
 D3D10_FILTER filters[] = {
 	D3D10_FILTER_MIN_MAG_MIP_POINT,
 	D3D10_FILTER_MIN_MAG_LINEAR_MIP_POINT,

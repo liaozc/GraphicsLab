@@ -84,6 +84,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PostEffect", "PostEffect", "{841AB392-39F0-44AC-8F09-3DDE0B18423C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cloth", "Samples\Cloth(OGL_2_DX11)\Cloth.vcxproj", "{5A076917-E74B-43BF-AA7F-A25E7AF8599E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -35,7 +35,7 @@ float4x4 invMvp;
 float3 main(PsIn In):SV_Target {
 	float3 diffuse = ambient.Sample(fliter,In.texcoord);
 	float spec = specular.Sample(fliter,In.texcoord);
-	float3 n = normal.Sample(fliter, In.texcoord).rgb * 2.0 - 1.0;
+	float3 n = normal.Sample(fliter, In.texcoord).rgb;
 	float d = depth.Sample(fliter,In.texcoord).r;
 	if(1.0 - d < 0.0001)//too close to the far plane
 		discard;
@@ -49,9 +49,9 @@ float3 main(PsIn In):SV_Target {
 	float3 viewVec = camPos - pos;
 	spec = pow(saturate(dot(reflect(-viewVec, n), sunlightDir)), spec);
 
-	diffuse = diffuse *  saturate(dot(sunlightDir, n));
+	diffuse = diffuse *  (saturate(dot(sunlightDir, n)) * float3(0.3,0.3,0.3));
 	
-	float3 rgb = n;
+	float3 rgb = diffuse; 
 
 	return rgb;
 

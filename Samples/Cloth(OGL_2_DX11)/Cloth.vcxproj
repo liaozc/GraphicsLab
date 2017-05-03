@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Ambient.shd" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +28,11 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="SpringSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="billboard.shd" />
+    <None Include="lighting.shd" />
+    <None Include="sphere.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5A076917-E74B-43BF-AA7F-A25E7AF8599E}</ProjectGuid>

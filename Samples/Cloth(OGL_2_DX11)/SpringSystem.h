@@ -45,7 +45,7 @@ typedef void (*ProcessNodeFunc)(SNode *node, float *attribs);
 class SpringSystem {
 public:
 	SpringSystem();
-
+	~SpringSystem();
 	void addRectField(unsigned int width, unsigned int height, void *pos, void *norm, unsigned int stride);
 
 	void update(float dTime, ProcessNodeFunc process = NULL, float *attribs = NULL);

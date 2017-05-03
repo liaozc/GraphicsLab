@@ -25,7 +25,7 @@ bool Alpha2CoverageApp::initAPI()
 	//however, it caculate n color samples every pixel when msaa is on and caculate one only sample when it is off.
 	//and n samples on coverage mask table in both as long as the Alpha2Coverage is on.So it can still get advantage from the 
 	//alpha2coverage but no msaa when msaa is off and alpha2coverage is on.
-	return D3D11App::initAPI(D3D11,DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_UNKNOWN, 1, NO_SETTING_CHANGE);
+	return D3D11App::initAPI(D3D11,DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_UNKNOWN, 4, NO_SETTING_CHANGE);
 	
 }
 

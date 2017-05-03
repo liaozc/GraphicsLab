@@ -1741,6 +1741,20 @@ IndexBufferID Direct3D11Renderer::addIndexBuffer(ID3D11Buffer* buffer, const uin
 	return indexBuffers.add(ib);
 }
 
+bool Direct3D11Renderer::updateVertexBuffer(VertexBufferID vb, const long size, const void * data)
+{	
+	VertexBuffer buff = vertexBuffers[vb];
+	if (!buff.vertexBuffer) return false;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr =context->Map(buff.vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(hr)) return false;
+	void* verticesPtr;
+	verticesPtr = (void*)mappedResource.pData;
+	memcpy(verticesPtr, (void*)data, size);
+	context->Unmap(buff.vertexBuffer, 0);
+	return true;
+}
+
 static const D3D11_FILTER filters[] =
 {
 	D3D11_FILTER_MIN_MAG_MIP_POINT,

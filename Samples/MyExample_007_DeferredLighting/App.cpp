@@ -26,12 +26,13 @@ bool DeferredLightingApp::load()
 
 	m_fill_buff_shd = renderer->addShader(ShaderDir("/fill_buffers.shd"));
 	m_ambient_shd = renderer->addShader(ShaderDir("/ambient.shd"));
+	m_light_shd = renderer->addShader(ShaderDir("/light.shd"));
 
 	DrawVert quad[] = {
-		{vec3(-20,0,20),vec3(0,1,0),vec3(1,0,0),vec3(0,0,1),vec2(0,0)},
-		{ vec3(20,0,20),vec3(0,1,0),vec3(1,0,0),vec3(0,0,1),vec2(1,0) },
-		{ vec3(20,0,-20),vec3(0,1,0),vec3(1,0,0),vec3(0,0,1),vec2(1,1) },
-		{ vec3(-20,0,-20),vec3(0,1,0),vec3(1,0,0),vec3(0,0,1),vec2(0,1) },
+		{vec3(-20,0,20),vec3(0,1,0),vec3(0,0,1),vec3(1,0,0),vec2(0,0)},
+		{ vec3(20,0,20),vec3(0,1,0),vec3(0,0,1),vec3(1,0,0),vec2(1,0) },
+		{ vec3(20,0,-20),vec3(0,1,0),vec3(0,0,1),vec3(1,0,0),vec2(1,1) },
+		{ vec3(-20,0,-20),vec3(0,1,0),vec3(0,0,1),vec3(1,0,0),vec2(0,1) },
 	};
 	ushort indices[] = {
 		0,1,2,
@@ -62,6 +63,9 @@ bool DeferredLightingApp::load()
 	m_diffuse_id = renderer->addTexture(ResDir("/Textures/FieldStone.dds"), false, SS_NONE);
 	m_normal_id = renderer->addTexture(ResDir("/Textures/FieldStoneBump.dds"), false, SS_NONE);
 	m_specular_id = renderer->addTexture(ResDir("/Textures/floor_wood_3.dds"), false, SS_NONE);
+	
+	
+	
 	//TEST RESOURCE
 	m_test_tex = renderer->addTexture(ResDir("/Textures/FieldStone.dds"),false,SS_NONE);
 
@@ -71,7 +75,7 @@ bool DeferredLightingApp::load()
 void DeferredLightingApp::drawFrame()
 {
 
-	vec3 eye(0, 55, 0);
+	vec3 eye(0, 40, -40);
 	vec3 lookAt(0, 0, 0);
 	vec3 up(0, 0, 1);
 	mat4 view = makeViewMatrixD3D(eye, lookAt, up);
@@ -113,10 +117,13 @@ void DeferredLightingApp::drawFrame()
 	renderer->setSamplerState("fliter", linearClamp);
 	renderer->setShaderConstant3f("camPos", vec3(0, 55, 0));
 	renderer->setShaderConstant4x4f("invMvp", !(mvp));
-	renderer->setShaderConstant3f("sunLightDir", normalize(vec3(1, 0.6f, 1)));
+	renderer->setShaderConstant3f("sunlightDir", normalize(vec3(1, 1, 1)));
 	renderer->apply();
-
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	context->Draw(3, 0);
+
+	//light pass
+	//init the stencil pass
+	
 
 }
