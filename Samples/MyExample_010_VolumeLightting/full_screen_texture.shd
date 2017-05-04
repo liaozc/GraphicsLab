@@ -1,0 +1,35 @@
+
+struct PsIn
+{
+	float4 Position : SV_Position;
+	float2 TexCoord : TexCoord;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID : SV_VertexID)
+{
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0f : -1.0f;
+	position.y = (VertexID == 2)? 3.0f : -1.0f;
+	position.zw = 1.0f;
+
+	Out.Position = position;
+	Out.TexCoord = position.xy * float2(0.5,-0.5) + 0.5;
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2D base;
+SamplerState filter;
+
+float3 main(PsIn In) : SV_Target {
+	float3 rgb = base.Sample(filter,In.TexCoord).rgb * 0.5;
+	return rgb;
+}

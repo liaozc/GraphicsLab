@@ -8,6 +8,7 @@ class EmptyApp : public D3D11App
 public:
 	char *getTitle() const { return "empty scene"; }
 	void drawFrame();
+	bool init();
 
 };
 

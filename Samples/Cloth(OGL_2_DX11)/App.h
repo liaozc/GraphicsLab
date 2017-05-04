@@ -40,7 +40,7 @@ public:
 protected:
 	SpringSystem spring;
 	Model* m_sphere;
-	//i should use a vb,but the framework don't surpport to dynamic change it.
+
 	DrawVert m_flag_vertexs[CLOTH_SIZE_Y][CLOTH_SIZE_X];
 	
 	VertexBufferID m_flag_vb;

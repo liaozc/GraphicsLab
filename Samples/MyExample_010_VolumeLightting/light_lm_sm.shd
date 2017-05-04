@@ -1,0 +1,77 @@
+
+struct VsIn {
+	float4 position : Position;
+	float4 normal : Normal;
+	float2 texcoord : TexCoord0;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float4 normal : NORMAL;
+	float2 texcoord :TEXCOORD0;
+	float4 worldPos : TEXCOORD1;
+	float viewZ : TEXCOORD2;
+};
+
+[Vertex shader]
+
+float4x4 view;
+float4x4 proj;
+float4x4 worldMatrix; 
+float4x4 worldMatrixNormal; // for normal
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.worldPos = mul(worldMatrix,In.position);
+	Out.position = mul(view, Out.worldPos);
+	Out.viewZ = Out.position.z;
+	Out.position = mul(proj, Out.position);
+	Out.normal = mul(worldMatrixNormal,In.normal);
+	Out.texcoord = In.texcoord;
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color: SV_Target0;
+	float depth: SV_Target1;
+
+};
+
+Texture2D LightMap;
+
+TextureCube shadowMap;
+SamplerState shadowFilter;
+
+SamplerState fliter;
+float4 color;
+
+float4 vMoveLightColor;
+float4 vMoveLightPos;
+float2 nf;
+float denisty;
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+	Out.color.rgb = LightMap.Sample(fliter,In.texcoord).rgb + float3(0.1,0.1,0.1);
+	//Out.color.rgb = 0;
+	Out.color.a = 1;
+
+	float4 shadowCoord = In.worldPos - vMoveLightPos;		
+	float4 vMoveLightDir = normalize(-shadowCoord);
+	float3 dist3 = In.worldPos - vMoveLightPos;
+	float dist = 1/dot(dist3,dist3);
+	float shadow = 0;
+	float sMax = max(max(abs(shadowCoord.x), abs(shadowCoord.y)), abs(shadowCoord.z));
+	float z = (1.0 / sMax) * nf.x + nf.y;
+	//shadow = shadowMap.SampleCmpLevelZero(shadowFilter, shadowCoord, z).x;
+	float r = shadowMap.Sample(shadowFilter, shadowCoord);
+	float3 rgb = shadowMap.Sample(shadowFilter, shadowCoord);
+	if(r > z * (0.999)){
+		shadow = 1;
+	}
+	Out.color.rgb = Out.color.rgb + saturate(dot((float3)vMoveLightDir,In.normal)) * shadow * vMoveLightColor * dist * denisty;
+	Out.depth = 1/In.viewZ;
+	return Out;
+}
