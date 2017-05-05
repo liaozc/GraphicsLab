@@ -879,11 +879,12 @@ void getParticipatingMedia(out float muS, out float muE, in vec3 pos)
 	const float fogFactor = 1.0 + D_STRONG_FOG * 5.0;
 
 	const float sphereRadius = 5.0;
-	float sphereFog = clamp((sphereRadius - length(pos - vec3(20.0, 19.0, -17.0))) / sphereRadius, 0.0, 1.0);
+	float sphereFog0 = clamp((sphereRadius - length(pos - vec3(20.0, 19.0, -17.0))) / sphereRadius, 0.0, 1.0);
+	float sphereFog1 = clamp((sphereRadius - length(pos - vec3(20.0, 35.0, -17.0))) / sphereRadius, 0.0, 1.0);
 
 	const float constantFog = 0.02;
 
-	muS = constantFog + heightFog*fogFactor + sphereFog;
+	muS = constantFog + heightFog*fogFactor + sphereFog0 + sphereFog1;
 
 	const float muA = 0.0;
 	muE = max(0.000000001, muA + muS); // to avoid division by zero extinction
