@@ -1,0 +1,386 @@
+
+struct PsIn {
+	float4 position : SV_Position;
+	float2 texcoord : TEXCOORD0;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID : SV_VertexID)
+{
+	PsIn Out;
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0f : -1.0f;
+	position.y = (VertexID == 2)? 3.0f : -1.0f;
+	position.zw = 1.0f;
+	Out.position = position;
+	Out.texcoord = position * float2(0.5,0.5) + 0.5;
+	return Out;
+}
+
+[Fragment shader]
+
+float2    iResolution;           // viewport resolution (in pixels)
+float     iGlobalTime;           // shader playback time (in seconds)
+float     iChannelTime[4];       // channel playback time (in seconds)
+float3    iChannelResolution[4]; // channel resolution (in pixels)
+float4    iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
+
+Texture2D iChannel0;          // input channel. XX = 2D/Cube
+Texture2D iChannel1;
+Texture2D iChannel2;
+Texture2D iChannel3;
+
+SamplerState iFilter;
+
+float4    iDate;                 // (year, month, day, time in seconds)
+float     iSampleRate;           // sound sample rate (i.e., 44100)
+
+
+//******* CONTENT START *****************
+
+/*
+* This are predefined settings you can quickly use
+*    - D_DEMO_FREE play with parameters as you would like
+*    - D_DEMO_SHOW_IMPROVEMENT_FLAT show improved integration on flat surface
+*    - D_DEMO_SHOW_IMPROVEMENT_NOISE show improved integration on noisy surface
+*    - the two previous without volumetric shadows
+*/
+#define D_DEMO_FREE
+//#define D_DEMO_SHOW_IMPROVEMENT_FLAT
+//#define D_DEMO_SHOW_IMPROVEMENT_NOISE
+//#define D_DEMO_SHOW_IMPROVEMENT_FLAT_NOVOLUMETRICSHADOW
+//#define D_DEMO_SHOW_IMPROVEMENT_NOISE_NOVOLUMETRICSHADOW
+
+#ifdef D_DEMO_FREE
+// Apply noise on top of the height fog?
+#define D_FOG_NOISE 1.0
+
+// Height fog multiplier to show off improvement with new integration formula
+#define D_STRONG_FOG 0.0
+
+// Enable/disable volumetric shadow (single scattering shadow)
+#define D_VOLUME_SHADOW_ENABLE 1
+
+// Use imporved scattering?
+// In this mode it is full screen and can be toggle on/off.
+#define D_USE_IMPROVE_INTEGRATION 1
+
+//
+// Pre defined setup to show benefit of the new integration. Use D_DEMO_FREE to play with parameters
+//
+
+#elif defined(D_DEMO_SHOW_IMPROVEMENT_FLAT)
+#define D_STRONG_FOG 10.0
+#define D_FOG_NOISE 0.0
+#define D_VOLUME_SHADOW_ENABLE 1
+#elif defined(D_DEMO_SHOW_IMPROVEMENT_NOISE)
+#define D_STRONG_FOG 5.0
+#define D_FOG_NOISE 1.0
+#define D_VOLUME_SHADOW_ENABLE 1
+#elif defined(D_DEMO_SHOW_IMPROVEMENT_FLAT_NOVOLUMETRICSHADOW)
+#define D_STRONG_FOG 10.0
+#define D_FOG_NOISE 0.0
+#define D_VOLUME_SHADOW_ENABLE 0
+#elif defined(D_DEMO_SHOW_IMPROVEMENT_NOISE_NOVOLUMETRICSHADOW)
+#define D_STRONG_FOG 3.0
+#define D_FOG_NOISE 1.0
+#define D_VOLUME_SHADOW_ENABLE 0
+#endif
+
+/*
+* Other options you can tweak
+*/
+
+// Used to control wether transmittance is updated before or after scattering (when not using improved integration)
+// If 0 strongly scattering participating media will not be energy conservative
+// If 1 participating media will look too dark especially for strong extinction (as compared to what it should be)
+// Toggle only visible when not using the improved scattering integration.
+#define D_UPDATE_TRANS_FIRST 0
+
+// Apply bump mapping on walls
+#define D_DETAILED_WALLS 0
+
+// Use to restrict ray marching length. Needed for volumetric evaluation.
+#define D_MAX_STEP_LENGTH_ENABLE 1
+
+// Light position and color
+#define LPOS float3( 20.0+15.0*sin(iGlobalTime), 15.0+12.0*cos(iGlobalTime),-20.0)
+#define LCOL (600.0*float3( 1.0, 0.9, 0.5))
+
+float displacementSimple(float2 p)
+{
+	float f;
+	f = 0.5000* iChannel0.SampleLevel(iFilter,p,0).x; 
+	p = p*2.0;
+	f += 0.2500* iChannel0.SampleLevel(iFilter,p,0).x; 
+	p = p*2.0;
+	f += 0.1250* iChannel0.SampleLevel(iFilter,p,0).x; 
+	p = p*2.0;
+	f += 0.0625* iChannel0.SampleLevel(iFilter,p,0).x; 
+	p = p*2.0;
+	return f;
+}
+
+float3 getSceneColor(float3 p, float material)
+{
+	if (material == 1.0)
+	{
+		return float3(1.0, 0.5, 0.5);
+	}
+	else if (material == 2.0)
+	{
+		return float3(0.5, 1.0, 0.5);
+	}
+	else if (material == 3.0)
+	{
+		return float3(0.5, 0.5, 1.0);
+	}
+
+	return float3(0.0, 0.0, 0.0);
+}
+
+
+float getClosestDistance(float3 p, out float material)
+{
+	float d = 0.0;
+#if D_MAX_STEP_LENGTH_ENABLE
+	float minD = 1.0; // restrict max step for better scattering evaluation
+#else
+	float minD = 10000000.0;
+#endif
+	material = 0.0;
+
+	float yNoise = 0.0;
+	float xNoise = 0.0;
+	float zNoise = 0.0;
+#if D_DETAILED_WALLS
+	yNoise = 1.0*clamp(displacementSimple(p.xz*0.005), 0.0, 1.0);
+	xNoise = 2.0*clamp(displacementSimple(p.zy*0.005), 0.0, 1.0);
+	zNoise = 0.5*clamp(displacementSimple(p.xy*0.01), 0.0, 1.0);
+#endif
+
+	d = max(0.0, p.y - yNoise);
+	if (d<minD)
+	{
+		minD = d;
+		material = 2.0;
+	}
+
+	d = max(0.0, p.x - xNoise);
+	if (d<minD)
+	{
+		minD = d;
+		material = 1.0;
+	}
+
+	d = max(0.0, 40.0 - p.x - xNoise);
+	if (d<minD)
+	{
+		minD = d;
+		material = 1.0;
+	}
+
+	d = max(0.0, -p.z - zNoise);
+	if (d<minD)
+	{
+		minD = d;
+		material = 3.0;
+	}
+
+	return minD;
+}
+
+
+float3 calcNormal(in float3 pos)
+{
+	float material = 0.0;
+	float3 eps = float3(0.3, 0.0, 0.0);
+	return normalize(float3(
+		getClosestDistance(pos + eps.xyy, material) - getClosestDistance(pos - eps.xyy, material),
+		getClosestDistance(pos + eps.yxy, material) - getClosestDistance(pos - eps.yxy, material),
+		getClosestDistance(pos + eps.yyx, material) - getClosestDistance(pos - eps.yyx, material)));
+
+}
+
+float3 evaluateLight(in float3 pos)
+{
+	float3 lightPos = LPOS;
+	float3 lightCol = LCOL;
+	float3 L = lightPos - pos;
+	float distanceToL = length(L);
+	return lightCol * 1.0 / (distanceToL*distanceToL);
+}
+
+float3 evaluateLight(in float3 pos, in float3 normal)
+{
+	float3 lightPos = LPOS;
+	float3 L = lightPos - pos;
+	float distanceToL = length(L);
+	float3 Lnorm = L / distanceToL;
+	return max(0.0, dot(normal, Lnorm)) * evaluateLight(pos);
+}
+
+// To simplify: wavelength independent scattering and extinction
+void getParticipatingMedia(out float muS, out float muE, in float3 pos)
+{
+	float heightFog = 7.0 + D_FOG_NOISE*3.0*clamp(displacementSimple(pos.xz*0.005 + iGlobalTime*0.01), 0.0, 1.0);
+	heightFog = 0.3*clamp((heightFog - pos.y)*1.0, 0.0, 1.0);
+
+	const float fogFactor = 1.0 + D_STRONG_FOG * 5.0;
+
+	const float sphereRadius = 5.0;
+	float sphereFog = clamp((sphereRadius - length(pos - float3(20.0, 19.0, -17.0))) / sphereRadius, 0.0, 1.0);
+
+	const float constantFog = 0.02;
+
+	muS = constantFog + heightFog*fogFactor + sphereFog;
+
+	const float muA = 0.0;
+	muE = max(0.000000001, muA + muS); // to avoid division by zero extinction
+}
+
+float phaseFunction()
+{
+	return 1.0 / (4.0*3.14);
+}
+
+
+float volumetricShadow(in float3 from, in float3 to)
+{
+#if D_VOLUME_SHADOW_ENABLE
+	const float numStep = 16.0; // quality control. Bump to avoid shadow alisaing
+	float shadow = 1.0;
+	float muS = 0.0;
+	float muE = 0.0;
+	float dd = length(to - from) / numStep;
+	for (float s = 0.5; s<(numStep - 0.1); s += 1.0)// start at 0.5 to sample at center of integral part
+	{
+		float3 pos = from + (to - from)*(s / (numStep));
+		getParticipatingMedia(muS, muE, pos);
+		shadow *= exp(-muE * dd);
+	}
+	return shadow;
+#else
+	return 1.0;
+#endif
+}
+
+
+void traceScene(bool improvedScattering, float3 rO, float3 rD, inout float3 finalPos, inout float3 normal, inout float3 albedo, inout float4 scatTrans)
+{
+	const int numIter = 100;
+
+	float muS = 0.0;
+	float muE = 0.0;
+
+	float3 lightPos = LPOS;
+
+	// Initialise volumetric scattering integration (to view)
+	float transmittance = 1.0;
+	float3 scatteredLight = float3(0.0, 0.0, 0.0);
+
+	float d = 1.0; // hack: always have a first step of 1 unit to go further
+	float material = 0.0;
+	float3 p = float3(0.0, 0.0, 0.0);
+	float dd = 0.0;
+	for (int i = 0; i<numIter; ++i)
+	{
+		float3 p = rO + d*rD;
+
+
+		getParticipatingMedia(muS, muE, p);
+
+#ifdef D_DEMO_FREE
+		if (D_USE_IMPROVE_INTEGRATION>0) // freedom/tweakable version
+#else
+		if (improvedScattering)
+#endif
+		{
+			// See slide 28 at http://www.frostbite.com/2015/08/physically-based-unified-volumetric-rendering-in-frostbite/
+			float3 S = evaluateLight(p) * muS * phaseFunction()* volumetricShadow(p, lightPos);// incoming light
+			float3 Sint = (S - S * exp(-muE * dd)) / muE; // integrate along the current step segment
+			scatteredLight += transmittance * Sint; // accumulate and also take into account the transmittance from previous steps
+
+													// Evaluate transmittance to view independentely
+			transmittance *= exp(-muE * dd);
+		}
+		else
+		{
+			// Basic scatering/transmittance integration
+#if D_UPDATE_TRANS_FIRST
+			transmittance *= exp(-muE * dd);
+#endif
+			scatteredLight += muS * evaluateLight(p) * phaseFunction() * volumetricShadow(p, lightPos) * transmittance * dd;
+#if !D_UPDATE_TRANS_FIRST
+			transmittance *= exp(-muE * dd);
+#endif
+		}
+
+		dd = getClosestDistance(p, material);
+		if (dd<0.2)
+			break; // give back a lot of performance without too much visual loss
+		d += dd;
+	}
+
+	albedo = getSceneColor(p, material);
+
+	finalPos = rO + d*rD;
+
+	normal = calcNormal(finalPos);
+
+	scatTrans = float4(scatteredLight, transmittance);
+}
+
+void mainImage(out float4 fragColor, in float2 fragCoord)
+{
+	//iGlobalTime
+	//iMouse
+	//iResolution
+
+	float2 uv2 = 2.0*fragCoord.xy / iResolution.xy - 1.0;
+
+	float3 camPos = float3(20.0, 18.0, -50.0);
+	if (iMouse.x + iMouse.y > 0.0) // to handle first loading and see somthing on screen
+		camPos += float3(0.05, 0.12, 0.0)*(float3(iMouse.x, iMouse.y, 0.0) - float3(iResolution.xy*0.5, 0.0));
+	float3 camX = float3(1.0, 0.0, 0.0) *0.75;
+	float3 camY = float3(0.0, 1.0, 0.0) *0.5;
+	float3 camZ = float3(0.0, 0.0, 1.0);
+
+	float3 rO = camPos;
+	float3 rD = normalize(uv2.x*camX + uv2.y*camY + camZ);
+	float3 finalPos = rO;
+	float3 albedo = float3(0.0, 0.0, 0.0);
+	float3 normal = float3(0.0, 0.0, 0.0);
+	float4 scatTrans = float4(0.0, 0.0, 0.0, 0.0);
+	traceScene(fragCoord.x>(iResolution.x / 2.0),rO, rD, finalPos, normal, albedo, scatTrans);
+
+
+	//lighting
+	float3 color = (albedo / 3.14) * evaluateLight(finalPos, normal) * volumetricShadow(finalPos, LPOS);
+	// Apply scattering/transmittance
+	color = color * scatTrans.w + scatTrans.xyz;
+
+	// Gamma correction
+	float gamma = 1.0 / 2.2;
+	color = pow(color, float3(gamma.xxx)); // simple linear to gamma, exposure of 1.0
+
+#ifndef D_DEMO_FREE
+										 // Separation line
+	if (abs(fragCoord.x - (iResolution.x*0.5))<0.6)
+		color.r = 0.5;
+#endif
+
+	fragColor = float4(color, 1.0);
+}
+
+//******* CONTENT START *****************
+
+float4 main(PsIn In) : SV_Target 
+{
+	float4 fragColor = 0;
+	float2 fragCoord = In.texcoord * iResolution;
+	mainImage(fragColor,fragCoord);
+	return fragColor;
+}

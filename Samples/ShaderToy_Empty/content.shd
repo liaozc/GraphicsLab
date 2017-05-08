@@ -1,0 +1,56 @@
+
+struct PsIn {
+	float4 position : SV_Position;
+	float2 texcoord : TEXCOORD0;
+};
+
+[Vertex shader]
+
+PsIn main(uint VertexID : SV_VertexID)
+{
+	PsIn Out;
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0f : -1.0f;
+	position.y = (VertexID == 2)? 3.0f : -1.0f;
+	position.zw = 1.0f;
+	Out.position = position;
+	Out.texcoord = position * float2(0.5,-0.5) + 0.5;
+	return Out;
+}
+
+[Fragment shader]
+
+float2    iResolution;           // viewport resolution (in pixels)
+float     iGlobalTime;           // shader playback time (in seconds)
+float     iChannelTime[4];       // channel playback time (in seconds)
+float3    iChannelResolution[4]; // channel resolution (in pixels)
+float4    iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
+
+Texture2D iChannel0;          // input channel. XX = 2D/Cube
+Texture2D iChannel1;
+Texture2D iChannel2;
+Texture2D iChannel3;
+
+SamplerState iFilter;
+
+float4    iDate;                 // (year, month, day, time in seconds)
+float     iSampleRate;           // sound sample rate (i.e., 44100)
+
+//******* CONTENT START *****************
+
+void mainImage(out float4 fragColor, in float2 fragCoord)
+{
+	fragColor = float4(fragCoord/iResolution,1,1);
+}
+
+//******* CONTENT START *****************
+
+
+float4 main(PsIn In) : SV_Target 
+{
+	float4 fragColor = 0;
+	float2 fragCoord = In.texcoord * iResolution;
+	mainImage(fragColor,fragCoord);
+	return fragColor;
+}
