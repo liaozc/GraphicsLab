@@ -50,8 +50,8 @@ uint FbxModel::makeDrawable(Renderer * renderer, const bool useCache, const Shad
 		if (m_texcoord0s.getCount() != 0) {
 			vec2* uvs = new vec2[m_texcoord0s.getCount()];
 			memcpy(uvs, m_texcoord0s.getArray(), sizeof(vec2) * m_texcoord0s.getCount());
-			uint* inds = new uint[m_inds.getCount()];
-			memcpy(inds, m_inds.getArray(), sizeof(uint) * m_inds.getCount());
+			uint* inds = new uint[m_texcoodIndis.getCount()];
+			memcpy(inds, m_texcoodIndis.getArray(), sizeof(uint) * m_texcoodIndis.getCount());
 			m_model->addStream(TYPE_TEXCOORD, 2, m_texcoord0s.getCount(), (float*)uvs, inds, false);
 		}
 		m_material.m_shader = shader;

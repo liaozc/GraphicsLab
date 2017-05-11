@@ -28,14 +28,14 @@ bool FBXApp::load()
 {
 	m_basic_shd = renderer->addShader(ShaderDir("/basic.shd"));
 	m_model = new FbxModel();
-	m_model->loadFbx(ResDir("/Models/Fbx/human2.fbx"),0.05f);
+	m_model->loadFbx(ResDir("/Models/Fbx/abenjianie.fbx"));
 	m_model->makeDrawable(renderer, true, m_basic_shd);
 
 	m_model_panel = new FbxModel();
 	m_model_panel->loadFbx(ResDir("/Models/Fbx/sadface.FBX"));
 	m_model_panel->makeDrawable(renderer, true, m_basic_shd);
 
-	m_test_id = renderer->addTexture(ResDir("/Textures/sadface.jpg"), SS_NONE);
+	m_test_id = renderer->addTexture(ResDir("/Textures/abenjianie.png"), SS_NONE);
 
 	RECT rect;
 	GetClientRect(hwnd, &rect);

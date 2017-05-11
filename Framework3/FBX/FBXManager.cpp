@@ -211,6 +211,7 @@ bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, 
 		}
 	}
 	else if (mapMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
+		/*
 		int polyIndexCounter = 0;
 		for (int i = 0; i < polyCount; i++) {
 			const int polySize = mesh->GetPolygonSize(i);
@@ -221,6 +222,23 @@ bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, 
 				(*texCoords)[ci] = vec2(uv.mData[0], uv.mData[1]);
 				polyIndexCounter++;
 			}
+		}
+		*/
+		if (useIndex) {
+			int indexCount = pUVs->GetIndexArray().GetCount();
+			model.m_texcoodIndis.setCount(indexCount);
+			//uint* indis = (uint*)pUVs->GetIndexArray().GetLocked();
+			//memcpy(model.m_texcoodIndis.getArray(), indis, sizeof(uint) * pUVs->GetIndexArray().GetCount());
+			for (int i = 0; i < indexCount; ++i)
+				model.m_texcoodIndis[i] = (pUVs->GetIndexArray().GetAt(i));
+		}
+		texCoords->setCount(pUVs->GetDirectArray().GetCount());
+		//vec2* uvs = (vec2*)pUVs->GetDirectArray().GetLocked();
+		//memcpy(texCoords->getArray(), uvs, sizeof(vec2) * pUVs->GetDirectArray().GetCount());
+		int vertCount = pUVs->GetDirectArray().GetCount();
+		for (int i = 0; i < vertCount; ++i) {
+			FbxVector2 uv = pUVs->GetDirectArray().GetAt(i);
+			(*texCoords)[i] = (vec2(uv.mData[0], uv.mData[1]));
 		}
 	}
 	return true;

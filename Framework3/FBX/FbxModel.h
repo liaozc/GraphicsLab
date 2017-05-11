@@ -40,6 +40,7 @@ public:
 	Array <vec3> m_normals;
 	Array <vec2> m_texcoord0s;
 	Array <vec2> m_texcoord1s;
+	Array <uint> m_texcoodIndis;
 	// model
 	Model* m_model;
 	//Material
