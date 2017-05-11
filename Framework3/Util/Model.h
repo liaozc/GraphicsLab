@@ -75,6 +75,7 @@ public:
 	bool save(const char *fileName);
 	bool loadObj(const char *fileName);
 	bool saveObj(const char *fileName);
+
 	bool loadT3d(const char *fileName, const bool removePortals = true, const bool removeInvisible = true, const bool removeTwoSided = false, const float texSize = 256.0f);
 
 	uint getVertexSize() const;

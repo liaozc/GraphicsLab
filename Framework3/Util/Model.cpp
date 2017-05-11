@@ -24,6 +24,8 @@
 
 #include "Hash.h"
 
+#include "../FBX/FBXManager.h"
+
 Model::Model(){
 	vertexFormat = VF_NONE;
 	vertexBuffer = VB_NONE;
@@ -1776,9 +1778,9 @@ void Model::setBuffers(Renderer *renderer){
 }
 
 void Model::draw(Renderer *renderer){
-	ASSERT(vertexBuffer != VB_NONE);
-	ASSERT(indexBuffer  != IB_NONE);
-
+	// ASSERT(vertexBuffer != VB_NONE);
+	// ASSERT(indexBuffer  != IB_NONE);
+	if (vertexBuffer == VB_NONE || indexBuffer == IB_NONE) return;
 	renderer->changeVertexFormat(vertexFormat);
 	renderer->changeVertexBuffer(0, vertexBuffer);
 	renderer->changeIndexBuffer(indexBuffer);

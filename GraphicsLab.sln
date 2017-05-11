@@ -89,12 +89,31 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cloth", "Samples\Cloth(OGL_
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExample_010_VolumeLighting", "Samples\MyExample_010_VolumeLightting\MyExample_010_VolumeLighting.vcxproj", "{F69231BB-F978-416E-A83A-09282769947D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShaderToy", "ShaderToy", "{06309D6B-1D7C-472D-8DA7-EFAE544D352C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderToy_Volumetric_Rendering", "Samples\ShaderToy_Volumetric_Rendering\ShaderToy_Volumetric_Rendering.vcxproj", "{AF58EDE8-B460-4F31-9214-4A1F74175FB4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderToy_Empty", "Samples\ShaderToy_Empty\ShaderToy_Empty.vcxproj", "{BB94CB20-DCA8-486C-95A6-AC1C976A9EBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderToy_Heart", "Samples\ShaderToy_Heart2D\ShaderToy_Heart.vcxproj", "{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyExample_011_FBX", "Samples\MyExample_011_FBX\MyExample_011_FBX.vcxproj", "{0F08D7AD-862E-4110-AC26-9B188A15D015}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32F05FA0-1707-4B88-8483-8D1B75BB6AE5} = {32F05FA0-1707-4B88-8483-8D1B75BB6AE5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -278,6 +297,22 @@ Global
 		{BB94CB20-DCA8-486C-95A6-AC1C976A9EBF}.Release|x64.Build.0 = Release|x64
 		{BB94CB20-DCA8-486C-95A6-AC1C976A9EBF}.Release|x86.ActiveCfg = Release|Win32
 		{BB94CB20-DCA8-486C-95A6-AC1C976A9EBF}.Release|x86.Build.0 = Release|Win32
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Debug|x64.ActiveCfg = Debug|x64
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Debug|x64.Build.0 = Debug|x64
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Debug|x86.ActiveCfg = Debug|Win32
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Debug|x86.Build.0 = Debug|Win32
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Release|x64.ActiveCfg = Release|x64
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Release|x64.Build.0 = Release|x64
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Release|x86.ActiveCfg = Release|Win32
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B}.Release|x86.Build.0 = Release|Win32
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Debug|x64.ActiveCfg = Debug|x64
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Debug|x64.Build.0 = Debug|x64
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Debug|x86.ActiveCfg = Debug|Win32
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Debug|x86.Build.0 = Debug|Win32
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Release|x64.ActiveCfg = Release|x64
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Release|x64.Build.0 = Release|x64
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Release|x86.ActiveCfg = Release|Win32
+		{0F08D7AD-862E-4110-AC26-9B188A15D015}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -305,5 +340,7 @@ Global
 		{F69231BB-F978-416E-A83A-09282769947D} = {BBCFA2EB-C1A8-4C71-BA4E-A3752CDD2D3E}
 		{AF58EDE8-B460-4F31-9214-4A1F74175FB4} = {06309D6B-1D7C-472D-8DA7-EFAE544D352C}
 		{BB94CB20-DCA8-486C-95A6-AC1C976A9EBF} = {06309D6B-1D7C-472D-8DA7-EFAE544D352C}
+		{BE1B619E-6E00-45ED-91D5-9E6E84A2A69B} = {06309D6B-1D7C-472D-8DA7-EFAE544D352C}
+		{0F08D7AD-862E-4110-AC26-9B188A15D015} = {BBCFA2EB-C1A8-4C71-BA4E-A3752CDD2D3E}
 	EndGlobalSection
 EndGlobal

@@ -174,6 +174,12 @@
     <ClInclude Include="..\CPU.h" />
     <ClInclude Include="..\Platform.h" />
     <ClInclude Include="..\Renderer.h" />
+    <ClInclude Include="..\FBX\FBXManager.h">
+      <Filter>FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FBX\FbxModel.h">
+      <Filter>FBX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Audio">
@@ -211,6 +217,9 @@
     </Filter>
     <Filter Include="Windows">
       <UniqueIdentifier>{480763cc-a8bc-48d5-9a16-430ecf2de3bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBX">
+      <UniqueIdentifier>{d6100438-1e43-4ea4-b113-69afb647848a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -327,6 +336,12 @@
     <ClCompile Include="..\CPU.cpp" />
     <ClCompile Include="..\Platform.cpp" />
     <ClCompile Include="..\Renderer.cpp" />
+    <ClCompile Include="..\FBX\FBXManager.cpp">
+      <Filter>FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FBX\FbxModel.cpp">
+      <Filter>FBX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Windows\Resources.rc">

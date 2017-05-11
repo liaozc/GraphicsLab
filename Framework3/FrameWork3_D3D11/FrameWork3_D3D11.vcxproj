@@ -44,6 +44,8 @@
     <ClInclude Include="..\Direct3D\Direct3DRenderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\FBX\FBXManager.h" />
+    <ClInclude Include="..\FBX\FbxModel.h" />
     <ClInclude Include="..\GUI\Button.h" />
     <ClInclude Include="..\GUI\CheckBox.h" />
     <ClInclude Include="..\GUI\Dialog.h" />
@@ -114,6 +116,8 @@
     <ClCompile Include="..\Direct3D\Direct3DRenderer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\FBX\FBXManager.cpp" />
+    <ClCompile Include="..\FBX\FbxModel.cpp" />
     <ClCompile Include="..\GUI\Button.cpp" />
     <ClCompile Include="..\GUI\CheckBox.cpp" />
     <ClCompile Include="..\GUI\Dialog.cpp" />
@@ -222,6 +226,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)Framework3\FBX\fbxsdk\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

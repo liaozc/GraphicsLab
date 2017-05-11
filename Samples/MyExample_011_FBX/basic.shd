@@ -1,0 +1,47 @@
+
+struct VsIn {
+	float4 position : Position;
+	float3 normal : Normal;
+	float2 texcoord : Texcoord;
+};
+
+struct PsIn {
+	float4 position : SV_Position;
+	float3 normal : NORMAL;
+	float2 texcoord : TEXCOORD0;
+
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = mul(worldViewProj, In.position);
+	Out.normal = In.normal;
+	Out.texcoord = In.texcoord;
+	return Out;
+}
+
+[Fragment shader]
+
+struct PsOut {
+	float4 color:SV_Target0;
+};
+
+Texture2D tex0;
+SamplerState filter0;
+
+PsOut main(PsIn In, bool frontFace : SV_IsFrontFace){
+	PsOut Out;
+	float3 normal = normalize(In.normal);
+	float lm = saturate(dot(float3(1,1,1),normal));
+	lm += saturate(dot(float3(-1,1,1),normal));
+	lm += saturate(dot(float3(-1,1,-1),normal));
+	lm += saturate(dot(float3(1,1,-1),normal));
+	float4 rgba = tex0.Sample(filter0,In.texcoord);
+	Out.color = lm * rgba;
+	Out.color.a = 1;
+	return Out;
+}
