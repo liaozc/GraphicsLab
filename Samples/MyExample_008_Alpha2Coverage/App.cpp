@@ -13,7 +13,6 @@ BaseApp *app = new Alpha2CoverageApp();
 
 bool Alpha2CoverageApp::init()
 {
-	initWorkDir();
 	return true;
 }
 
@@ -31,6 +30,8 @@ bool Alpha2CoverageApp::initAPI()
 
 bool Alpha2CoverageApp::load()
 {
+	initWorkDir(renderer);
+
 	m_tex_ss = renderer->addSamplerState(BILINEAR, WRAP, WRAP, WRAP);
 	if((m_tex_id = renderer->addTexture(ResDir("/Textures/fence.dds"),false, m_tex_ss)) == TEXTURE_NONE) return false;
 	if ((m_tex_shd = renderer->addShader(ShaderDir("/plain_texture.shd"))) == SHADER_NONE) return false;

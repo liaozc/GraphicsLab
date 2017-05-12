@@ -171,7 +171,6 @@ void App::resetCamera()
 
 bool App::init()
 {
-	initWorkDir();
 
 	srand(GetTickCount());
 
@@ -442,6 +441,8 @@ void App::exitAPI()
 
 bool App::load()
 {
+	initWorkDir(renderer);
+
 	// Shaders
 	if ((m_Lighting[CLUSTERED]   = renderer->addShader(ShaderDir("/Lighting.shd"), DEFINE_STR(LIGHT_COUNT))) == SHADER_NONE) return false;
 	if ((m_Lighting[NO_CLUSTERS] = renderer->addShader(ShaderDir("/Lighting.shd"), DEFINE_STR(LIGHT_COUNT) "#define NO_CLUSTERS\n")) == SHADER_NONE) return false;

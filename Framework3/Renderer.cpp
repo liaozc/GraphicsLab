@@ -193,18 +193,26 @@ void Renderer::clear(){
 */
 
 TextureID Renderer::addTexture(const char *fileName, const bool useMipMaps, const SamplerStateID samplerState, uint flags){
+	
+	String fullPath = fileName;
+	bool slashFound = fullPath.find("/");
+	if(!slashFound)
+		slashFound = fullPath.find("\\");
+	if (!slashFound)
+		fullPath = defaultResDir + "/Textures/" + fileName;
+	const char *realFileName = (const char*)(fullPath);
 	Image img;
 
 	uint loadFlags = 0;
 	if (!useMipMaps) loadFlags |= DONT_LOAD_MIPMAPS;
 
-	if (img.loadImage(fileName, loadFlags)){
+	if (img.loadImage(realFileName, loadFlags)){
 		if (img.getFormat() == FORMAT_RGBE8) img.unpackImage();
 		if (useMipMaps && img.getMipMapCount() <= 1) img.createMipMaps();
 		return addTexture(img, samplerState, flags);
 	} else {
 		char str[256];
-		sprintf(str, "Couldn't open \"%s\"", fileName);
+		sprintf(str, "Couldn't open \"%s\"", realFileName);
 
 		ErrorMsg(str);
 		return TEXTURE_NONE;
@@ -510,6 +518,16 @@ void Renderer::setViewport(const int width, const int height){
 
 void Renderer::resetStatistics(){
 	nDrawCalls = 0;
+}
+
+void Renderer::setDefaultResDir(String dResDir)
+{
+	defaultResDir = dResDir;
+}
+
+void Renderer::setViewProj(mat4 vp)
+{
+	viewProj = vp;
 }
 
 #ifdef PROFILE

@@ -7,12 +7,13 @@ BaseApp *app = new VolumetricRenderingApp();
 
 bool VolumetricRenderingApp::init()
 {
-	initWorkDir();
 	return true;
 }
 
 bool VolumetricRenderingApp::load()
 {
+	initWorkDir(renderer);
+
 	m_content_shd = renderer->addShader(ShaderDir("/content.shd"));
 
 	m_iChannel0_id = renderer->addTexture(ResDir("/Textures/noise.png"),SS_NONE);

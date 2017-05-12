@@ -16,7 +16,6 @@ BaseApp* app = new ClothApp();
 
 bool ClothApp::init()
 {
-	initWorkDir();
 	initNoise();
 	initCPU();
 	nextTime = 0;
@@ -31,6 +30,8 @@ void ClothApp::exit()
 
 bool ClothApp::load()
 {
+	initWorkDir(renderer);
+
 	m_lighting_shd = renderer->addShader(ShaderDir("/lighting.shd"));
 	m_sphere_shd = renderer->addShader(ShaderDir("/sphere.shd"));
 	m_billboard_shd = renderer->addShader(ShaderDir("/billboard.shd"));

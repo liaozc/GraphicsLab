@@ -11,8 +11,8 @@ BaseApp *app = new FBXApp();
 
 bool FBXApp::init()
 {
-	initWorkDir();
-	m_camera_dist = 200;
+	m_camera_dist = 100;
+	m_camera_pos = vec3(0, 0, m_camera_dist);
 	m_camera_angel = 0;
 	return true;
 }
@@ -26,16 +26,16 @@ void FBXApp::exit()
 
 bool FBXApp::load()
 {
+	initWorkDir(renderer);
+
 	m_basic_shd = renderer->addShader(ShaderDir("/basic.shd"));
 	m_model = new FbxModel();
-	m_model->loadFbx(ResDir("/Models/Fbx/abenjianie.fbx"));
+	m_model->loadFbx(ResDir("/Models/Fbx/human2.fbx"),0.05f);
 	m_model->makeDrawable(renderer, true, m_basic_shd);
 
 	m_model_panel = new FbxModel();
 	m_model_panel->loadFbx(ResDir("/Models/Fbx/sadface.FBX"));
 	m_model_panel->makeDrawable(renderer, true, m_basic_shd);
-
-	m_test_id = renderer->addTexture(ResDir("/Textures/abenjianie.png"), SS_NONE);
 
 	RECT rect;
 	GetClientRect(hwnd, &rect);
@@ -49,31 +49,30 @@ bool FBXApp::onKey(const uint key, const bool pressed)
 	if (D3D11App::onKey(key, pressed))
 		return true;
 	if (key == KEY_LEFT) {
-		m_camera_angel -= 0.1f;
+		m_camera_pos += 0.1f * m_view.rows[0].xyz();
 	}
 	else if (key == KEY_RIGHT) {
-		m_camera_angel += 0.1f;
+		m_camera_pos -= 0.1f * m_view.rows[0].xyz();
 	}
 	else if (key == KEY_UP) {
-		m_camera_dist -= 5;
+		m_camera_pos -= 5 * m_view.rows[2].xyz();
 	}
 	else if (key == KEY_DOWN) {
-		m_camera_dist += 5;
+		m_camera_pos += 5 * m_view.rows[2].xyz();
 	}
 	return true;
 }
 
 void FBXApp::updateFrame()
 {
-	vec3 eye;
-	eye.y = m_camera_dist * sinf(wx);
-	eye.x = m_camera_dist * cosf(wx) * cosf(wy);
-	eye.z = m_camera_dist * cosf(wx) * sinf(wy);
-	vec3 up(0, 1, 0);
-	if (eye.x == eye.z &&  eye.z == 0)
-		up = vec3(0, 0, 1);
-	vec3 lookAt(0, 0, 0);
-	m_view = makeViewMatrixD3D(eye, lookAt, up);
+	float cosX = cosf(wx), sinX = sinf(wx), cosY = cosf(wy), sinY = sinf(wy);
+	vec3 dx(cosY, 0, sinY);
+	vec3 dy(-sinX * sinY,  cosX, sinX * cosY);
+	vec3 dz(-cosX * sinY, -sinX, cosX * cosY);
+	mat4 viewRot(vec4(dx,0), vec4(dy, 0), vec4(dz, 0), vec4(0,0,0,1));
+	vec3 eye = - m_camera_pos;
+	mat4 viewTran(vec4(1,0,0, -eye.x), vec4(0, 1, 0, -eye.y), vec4(0, 0, 1, -eye.z), vec4(0, 0, 0, 1));
+	m_view = viewRot * viewTran;
 }
 
 
@@ -85,15 +84,18 @@ void FBXApp::drawFrame()
 	
 	mat4 proj = perspectiveMatrix(0.15f, m_ratio, 0.1f, 1000);
 	mat4 worldViewProj = proj * m_view;
-
+/*
 	renderer->reset();
 	renderer->setRasterizerState(cullBack);
 	renderer->setShader(m_basic_shd);
-	renderer->setShaderConstant4x4f("worldViewProj", worldViewProj);
+	renderer->setShaderConstant4x4f("worldMatrix", identity4());
+	renderer->setShaderConstant4x4f("viewProj", worldViewProj);
 	renderer->setTexture("tex0", m_test_id);
 	renderer->setSamplerState("filter0", linearClamp);
 	renderer->apply();
-	m_model_panel->draw(renderer);
+*/
+	renderer->setViewProj(worldViewProj);
+	//m_model_panel->draw(renderer);
 	m_model->draw(renderer);
 	
 }

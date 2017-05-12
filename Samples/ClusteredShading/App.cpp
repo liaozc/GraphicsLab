@@ -87,7 +87,6 @@ void App::onSize(const int w, const int h)
 
 bool App::init()
 {
-	initWorkDir();
 	// No framework created depth buffer
 	depthBits = 0;
 
@@ -193,6 +192,8 @@ void App::exitAPI()
 
 bool App::load()
 {
+	initWorkDir(renderer);
+
 	int sampleCount = max(antiAliasSamples, 1);
 
 	char def[256];

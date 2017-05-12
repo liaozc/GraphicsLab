@@ -14,7 +14,6 @@ BaseApp *app = new BloomApp();
 
 bool BloomApp::init()
 {
-	initWorkDir();
 	return true;
 }
 
@@ -25,6 +24,8 @@ void BloomApp::exit()
 
 bool BloomApp::load()
 {
+	initWorkDir(renderer);
+
 	m_spec_shd = renderer->addShader(ShaderDir("/spec.shd"));
 	m_bloom_shd = renderer->addShader(ShaderDir("/bloom.shd"));
 	m_sphere = new Model();

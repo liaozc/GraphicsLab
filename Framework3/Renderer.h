@@ -26,7 +26,7 @@
 #include "Util/Array.h"
 #include "Math/Vector.h"
 #include "Imaging/Image.h"
-
+#include "Util/String.h"
 #include <stdio.h>
 
 typedef int TextureID;
@@ -487,6 +487,10 @@ public:
 	void addDrawCalls(const uint nCalls){ nDrawCalls += nCalls; }
 	uint getDrawCallCount(){ return nDrawCalls; }
 
+	void setDefaultResDir(String dResDir);
+	void setViewProj(mat4 vp);
+	mat4 getViewProj() const { return viewProj; }
+
 #ifdef PROFILE
 	// Profiling
 	void profileFrameStart(const float frameTime);
@@ -541,6 +545,9 @@ protected:
 
 	// Statistics counters
 	uint nDrawCalls;
+
+	String defaultResDir;
+	mat4 viewProj;
 
 #ifdef PROFILE
 	// Profiling

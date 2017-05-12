@@ -17,12 +17,12 @@ BaseApp *app = new DeferredLightingApp();
 
 bool DeferredLightingApp::init()
 {
-	initWorkDir();
 	return true;
 }
 
 bool DeferredLightingApp::load()
 {
+	initWorkDir(renderer);
 
 	m_fill_buff_shd = renderer->addShader(ShaderDir("/fill_buffers.shd"));
 	m_ambient_shd = renderer->addShader(ShaderDir("/ambient.shd"));

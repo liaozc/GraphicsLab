@@ -16,12 +16,13 @@ void OITApp::exitAPI() {
 
 bool OITApp::init()
 {
-	initWorkDir();
 	return true;
 }
 
 bool OITApp::load()
 {
+	initWorkDir(renderer);
+
 	m_render_shd = renderer->addShader(ShaderDir("/render.shd"));
 	m_sort_shd = renderer->addShader(ShaderDir("/sort.shd"));
 	m_stencil_clear_shd = renderer->addShader(ShaderDir("/stencilClear.shd"));

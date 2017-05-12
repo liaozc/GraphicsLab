@@ -21,6 +21,7 @@ protected:
 	bool loadAttributes_mesh(fbxsdk::FbxNodeAttribute* nodeAtt, FbxModel& model,float scale);
 	bool loadElement_normal(fbxsdk::FbxMesh* mesh, FbxModel& model);
 	bool loadElement_uv(fbxsdk::FbxMesh* mesh, FbxModel& model,int uvIndex = 0);
+	bool loadElement_material(fbxsdk::FbxMesh* mesh, FbxModel& model,int texIndex = 0);
 public:
 	static FBXSimpleManager* getInstance();
 	static void destory();

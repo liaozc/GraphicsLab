@@ -6,20 +6,20 @@
 #include "../Math/Vector.h"
 #include "../Renderer.h"
 #include "../Util/Model.h"	//we will use the stream merge functionality
+#include "../Util/String.h"
 
 class FbxMaterial {
 public:
 	FbxMaterial() 
 	{
 		m_texs[0] = m_texs[1] = m_texs[2] = m_texs[3] = TEXTURE_NONE;
+		m_filters[0] = m_filters[1] = m_filters[2] = m_filters[3] = SS_NONE;
 	}
-	void Apply(Renderer* renderer)
-	{
-
-	}
-
+	void Apply(Renderer* renderer);
 	TextureID m_texs[4];
+	SamplerStateID m_filters[4];
 	ShaderID m_shader;
+	RasterizerStateID m_cull;
 };
 
 
@@ -45,7 +45,7 @@ public:
 	Model* m_model;
 	//Material
 	FbxMaterial m_material;
-
+	String m_tex_name;
 	//children
 	Array<FbxModel*> m_children; 
 };

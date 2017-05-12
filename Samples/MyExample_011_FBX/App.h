@@ -21,11 +21,10 @@ protected:
 	FbxModel* m_model_panel;
 	ShaderID m_basic_shd;
 	
-	TextureID m_test_id;
-
 	float m_ratio;
 	float m_camera_angel;
 	float m_camera_dist;
+	vec3 m_camera_pos;
 	mat4 m_view;
 
 };

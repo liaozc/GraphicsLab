@@ -105,7 +105,6 @@ void App::moveCamera(const vec3 &dir)
 
 bool App::init()
 {
-	initWorkDir();
 	speed = 50;
 
 	m_Pole = new Model();
@@ -142,6 +141,8 @@ const int WIRE_COUNT = elementsOf(poles) - 1;
 
 bool App::load()
 {
+	initWorkDir(renderer);
+
 	// Shaders
 	if ((m_TerrainShader = renderer->addShader(ShaderDir("/Terrain.shd"))) == SHADER_NONE) return false;
 	if ((m_SkyboxShader = renderer->addShader(ShaderDir("/Skybox.shd"))) == SHADER_NONE) return false;

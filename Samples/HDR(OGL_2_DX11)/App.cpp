@@ -58,7 +58,6 @@ bool App::onKey(const uint key, const bool pressed){
 
 bool App::init(){
 
-	initWorkDir();
 
 	FILE *file = fopen(ShaderDir("/flypath.pth"), "rb");
 	if (file){
@@ -311,6 +310,8 @@ bool App::initAPI(){
 }
 
 bool App::load(){
+	initWorkDir(renderer);
+
 	// Shaders
 	const char *attribs[] = { NULL, "textureCoord", "tangent", "binormal", "normal", "lightMapCoord" };
 	if ((lighting = renderer->addShader(ShaderDir("/lighting.shd"), attribs, elementsOf(attribs))) == SHADER_NONE) return false;

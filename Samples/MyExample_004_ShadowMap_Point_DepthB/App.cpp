@@ -24,7 +24,6 @@ struct DrawVert2
 
 bool ShadowMapApp_PointDepthB::init()
 {
-	initWorkDir();
 	m_sphere = 0;
 
 	return true;
@@ -38,6 +37,7 @@ void ShadowMapApp_PointDepthB::exit()
 
 bool ShadowMapApp_PointDepthB::load()
 {
+	initWorkDir(renderer);
 
 	m_plain_light_shd = renderer->addShader(ShaderDir("/plain_light.shd"));
 	m_light_shdadow_shd = renderer->addShader(ShaderDir("/light_shadow.shd"));

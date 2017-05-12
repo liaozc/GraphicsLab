@@ -25,7 +25,6 @@ void App::onSize(const int w, const int h){
 }
 
 bool App::init(){
-	initWorkDir();
 	// Load the geometry
 	model = new Model();
 	if (!model->loadObj(ResDir("/Models/Horse.hml"))){
@@ -53,6 +52,8 @@ void App::exitAPI(){
 }
 
 bool App::load(){
+	initWorkDir(renderer);
+
 	// Shaders
 	if ((render = renderer->addShader(ShaderDir("/render.shd"))) == SHADER_NONE) return false;
 	if ((sort = renderer->addShader(ShaderDir("/sort.shd"))) == SHADER_NONE) return false;

@@ -1,10 +1,28 @@
 #include "FbxModel.h"
 #include "FBXManager.h"
 
+
+
+void FbxMaterial::Apply(Renderer * renderer)
+{
+	renderer->reset();
+	renderer->setRasterizerState(m_cull);
+	renderer->setShader(m_shader);
+	renderer->setShaderConstant4x4f("worldMatrix", identity4());
+	renderer->setShaderConstant4x4f("viewProj", renderer->getViewProj());
+	renderer->setTexture("tex0", m_texs[0]);
+	renderer->setSamplerState("filter0", m_filters[0]);
+	renderer->apply();
+
+}
+
+
+
+////////////////////model/////////////////////
+
 FbxModel::FbxModel()
 {
 	m_model = nullptr;
-
 }
 
 FbxModel::~FbxModel()
@@ -55,6 +73,11 @@ uint FbxModel::makeDrawable(Renderer * renderer, const bool useCache, const Shad
 			m_model->addStream(TYPE_TEXCOORD, 2, m_texcoord0s.getCount(), (float*)uvs, inds, false);
 		}
 		m_material.m_shader = shader;
+		if (!m_tex_name.isEmpty()) {
+			m_material.m_texs[0] = renderer->addTexture(m_tex_name,true,SS_NONE);
+			m_material.m_filters[0] = renderer->addSamplerState(LINEAR, CLAMP, CLAMP, CLAMP);
+			m_material.m_cull = renderer->addRasterizerState(CULL_BACK);
+		}
 		bool drawable = m_verts.getCount() > 0;
 		return drawable ? m_model->makeDrawable(renderer, useCache, shader) : 0;
 	}
@@ -64,8 +87,10 @@ uint FbxModel::makeDrawable(Renderer * renderer, const bool useCache, const Shad
 
 void FbxModel::draw(Renderer * renderer)
 {
-	if(m_model)
+	if (m_model) {
+		m_material.Apply(renderer);
 		m_model->draw(renderer);
+	}
 	for (uint i = 0; i < m_children.getCount(); ++i) {
 		m_children[i]->draw(renderer);
 	}
@@ -85,3 +110,4 @@ bool FbxModel::isEmpty() const
 {
 	return vertCount() == 0;
 }
+

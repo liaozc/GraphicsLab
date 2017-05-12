@@ -44,8 +44,6 @@ void App::onSize(const int w, const int h){
 
 bool App::init(){
 	
-	initWorkDir();
-
 	initNoise();
 	pause = false;
 
@@ -74,6 +72,9 @@ void App::exitAPI(){
 }
 
 bool App::load(){
+	
+	initWorkDir(renderer);
+
 	// Shaders
 	if ((fillBuffers = renderer->addShader(ShaderDir("/fillBuffers.shd"))) == SHADER_NONE) return false;
 	if ((ambient     = renderer->addShader(ShaderDir("/ambient.shd")    )) == SHADER_NONE) return false;

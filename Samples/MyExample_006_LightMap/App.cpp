@@ -25,7 +25,6 @@ BaseApp *app = new LightMapApp();
 
 bool LightMapApp::init()
 {
-	initWorkDir();
 	m_camera_angel = 0;
 	m_camera_dist = 150;
 	return true;
@@ -39,6 +38,8 @@ void LightMapApp::exit()
 
 bool LightMapApp::load()
 {
+	initWorkDir(renderer);
+
 	m_light_lm_shd = renderer->addShader(ShaderDir("/light_lm_sm.shd"));
 	m_plain_light_shd = renderer->addShader(ShaderDir("/plain_light.shd"));
 	m_ground_shd = renderer->addShader(ShaderDir("/light_lm_sm_tex_normal.shd"));

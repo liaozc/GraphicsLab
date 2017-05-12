@@ -40,7 +40,6 @@ void App::onSize(const int w, const int h){
 
 bool App::init(){
 
-	initWorkDir();
 
 	// Load the geometry
 	map = new Model();
@@ -90,6 +89,9 @@ void App::exitAPI(){
 }
 
 bool App::load(){
+
+	initWorkDir(renderer);
+
 	// Shaders
 	if ((fillBuffers = renderer->addShader(ShaderDir("/fillBuffers.shd"))) == SHADER_NONE) return false;
 	if ((preZ[0]     = renderer->addShader(ShaderDir("/preZ0.shd"))) == SHADER_NONE) return false;

@@ -7,12 +7,12 @@ BaseApp *app = new EmptyApp();
 
 bool EmptyApp::init()
 {
-	initWorkDir();
 	return true;
 }
 
 bool EmptyApp::load()
 {
+	initWorkDir(renderer);
 	m_content_shd = renderer->addShader(ShaderDir("/content.shd"));
 
 	RECT rect;

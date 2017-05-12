@@ -1618,7 +1618,9 @@ uint Model::assemble(const StreamID *aStreams, const uint nStreams, float **dest
 	uint *iDest = *destIndices = new uint[nIndices];
 
 	uint *iIndex = new uint[nStreams];
-	Hash hash(nStreams, nIndices >> 3, nIndices);
+	int entryCount = nIndices >> 3;
+	entryCount = entryCount > 0 ? entryCount : nIndices;
+	Hash hash(nStreams, entryCount, nIndices);
 	for (j = 0; j < nIndices; j++){
 		for (i = 0; i < nStreams; i++){
 			iIndex[i] = streams[aStreams[i]].indices[j];

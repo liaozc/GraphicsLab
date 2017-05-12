@@ -1,6 +1,7 @@
 
 #include "FBXManager.h"
 #include "fbxsdk/include/fbxsdk.h"
+#include <string>
 using namespace fbxsdk;
 
 FBXSimpleManager* FBXSimpleManager::m_instance = nullptr;
@@ -100,7 +101,7 @@ bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, F
 	int vertCount = mesh->GetControlPointsCount();
 	for (int i = 0; i < vertCount; ++i) {
 		fbxsdk::FbxVector4 pos = mesh->GetControlPointAt(i);
-		vec3 position = vec3(pos.mData[0], pos.mData[1], pos.mData[2]) * scale;
+		vec3 position = vec3((float)pos.mData[0], (float)pos.mData[1], (float)pos.mData[2]) * scale;
 		model.m_verts.add(position);
 	}
 	//get indices
@@ -115,9 +116,10 @@ bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, F
 		loadElement_normal(mesh, model);
 	// -- texcoord0
 		loadElement_uv(mesh, model, 0);
+	//texture0
+		loadElement_material(mesh, model, 0);
 
-
-#if 1
+#if 0
 	//make the right-handeness coord to d3d
 	for (int i = 0; i < vertCount; ++i) {
 		vec3 X(1, 0, 0);
@@ -138,6 +140,10 @@ bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, F
 		ushort temp = model.m_inds[i];
 		model.m_inds[i] = model.m_inds[i + 2];
 		model.m_inds[i + 2] = temp;
+
+		temp = model.m_texcoodIndis[i];
+		model.m_texcoodIndis[i] = model.m_texcoodIndis[i + 2];
+		model.m_texcoodIndis[i + 2] = temp;
 	}
 #endif
 	return false;
@@ -163,20 +169,20 @@ bool FBXSimpleManager::loadElement_normal(fbxsdk::FbxMesh* mesh, FbxModel & mode
 				int ci = mesh->GetPolygonVertex(i, vi);//get the index of the current vertex in control points array
 				int nIndex = useIndex ? pNormals->GetIndexArray().GetAt(ci) : ci; //the UV index depends on the reference mode
 				FbxVector4 normal = pNormals->GetDirectArray().GetAt(nIndex);
-				model.m_normals[ci] = vec3(normal.mData[0], normal.mData[1], normal.mData[2]);
+				model.m_normals[ci] = vec3((float)normal.mData[0], (float)normal.mData[1], (float)normal.mData[2]);
 			}
 		}
 	}
 	else if (mapMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
 		int polyIndexCounter = 0;
 		int uvCount = pNormals->GetDirectArray().GetCount();
-		for (int i = 0; i < polyCount; i ++ )	{
+		for (uint i = 0; i < polyCount; i ++ )	{
 			const int polySize = mesh->GetPolygonSize(i);
 			for (int vi = 0; vi < polySize; vi ++) {
 				int nIndex = useIndex ? pNormals->GetIndexArray().GetAt(polyIndexCounter) : polyIndexCounter;
 				FbxVector4 normal = pNormals->GetDirectArray().GetAt(nIndex);
 				int ci = mesh->GetPolygonVertex(i, vi);
-				model.m_normals[ci] += vec3(normal.mData[0], normal.mData[1], normal.mData[2]);
+				model.m_normals[ci] += vec3((float)normal.mData[0], (float)normal.mData[1], (float)normal.mData[2]);
 				polyIndexCounter++;
 			}
 		}
@@ -206,41 +212,73 @@ bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, 
 				int ci = mesh->GetPolygonVertex(i, vi);//get the index of the current vertex in control points array
 				int uvIndex = useIndex ? pUVs->GetIndexArray().GetAt(ci) : ci; //the UV index depends on the reference mode
 				FbxVector2 uv = pUVs->GetDirectArray().GetAt(uvIndex);
-				(*texCoords)[ci] = vec2(uv.mData[0], uv.mData[1]);
+				(*texCoords)[ci] = vec2((float)uv.mData[0], (float)uv.mData[1]);
 			}
 		}
 	}
 	else if (mapMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
-		/*
-		int polyIndexCounter = 0;
-		for (int i = 0; i < polyCount; i++) {
-			const int polySize = mesh->GetPolygonSize(i);
-			for (int vi = 0; vi < polySize; vi++) {
-				int uvIndex = useIndex ? pUVs->GetIndexArray().GetAt(polyIndexCounter) : polyIndexCounter;
-				FbxVector2 uv = pUVs->GetDirectArray().GetAt(uvIndex);
-				int ci = mesh->GetPolygonVertex(i, vi);
-				(*texCoords)[ci] = vec2(uv.mData[0], uv.mData[1]);
-				polyIndexCounter++;
-			}
-		}
-		*/
 		if (useIndex) {
 			int indexCount = pUVs->GetIndexArray().GetCount();
 			model.m_texcoodIndis.setCount(indexCount);
-			//uint* indis = (uint*)pUVs->GetIndexArray().GetLocked();
-			//memcpy(model.m_texcoodIndis.getArray(), indis, sizeof(uint) * pUVs->GetIndexArray().GetCount());
 			for (int i = 0; i < indexCount; ++i)
 				model.m_texcoodIndis[i] = (pUVs->GetIndexArray().GetAt(i));
 		}
+		else {
+			int indexCount = mesh->GetPolygonVertexCount();
+			model.m_texcoodIndis.setCount(indexCount);
+			for (int i = 0; i < indexCount; ++i) {
+				model.m_texcoodIndis[i] = i;
+			}
+		}
 		texCoords->setCount(pUVs->GetDirectArray().GetCount());
-		//vec2* uvs = (vec2*)pUVs->GetDirectArray().GetLocked();
-		//memcpy(texCoords->getArray(), uvs, sizeof(vec2) * pUVs->GetDirectArray().GetCount());
 		int vertCount = pUVs->GetDirectArray().GetCount();
 		for (int i = 0; i < vertCount; ++i) {
 			FbxVector2 uv = pUVs->GetDirectArray().GetAt(i);
-			(*texCoords)[i] = (vec2(uv.mData[0], uv.mData[1]));
+			(*texCoords)[i] = (vec2((float)uv.mData[0], (float)uv.mData[1]));
 		}
 	}
+	return true;
+}
+
+bool FBXSimpleManager::loadElement_material(fbxsdk::FbxMesh * mesh, FbxModel & model, int texIndex)
+{
+	//it is temp  implemented. it has many potential issues.
+	int matCount = mesh->GetNode()->GetSrcObjectCount<fbxsdk::FbxSurfaceMaterial>();
+	if (matCount == 0) return false;
+	FbxSurfaceMaterial* pMat = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(0);
+	if (!pMat) return false;
+	fbxsdk::FbxProperty prop = pMat->FindProperty(FbxLayerElement::sTextureChannelNames[0]);
+	//get texture
+	int texCount = prop.GetSrcObjectCount<fbxsdk::FbxTexture>();
+	if (texCount == 0) return false;
+	char* textureName = nullptr;
+	fbxsdk::FbxLayeredTexture *layerTex = prop.GetSrcObject<FbxLayeredTexture>(0);
+	if (layerTex) {
+		int ltexCount = layerTex->GetSrcObjectCount<fbxsdk::FbxTexture>();
+		//for (int k = 0; k<ltexCount; ++k){
+			FbxTexture* ltex = layerTex->GetSrcObject<fbxsdk::FbxTexture>(0);
+			if (ltex){
+				FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex);
+				if (!lftex) return false;
+				textureName = (char*)lftex->GetFileName();
+			}
+		//}
+	}
+	else {
+		FbxTexture* ltex = prop.GetSrcObject<FbxTexture>(0);
+		if (ltex) {
+			FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex); 
+			if (!lftex) return false;
+			textureName = (char*)lftex->GetFileName();
+		}
+	}
+	if (!textureName)  return false;
+	std::string fileName = textureName;
+	std::string::size_type pos = fileName.rfind('/');
+	if (pos == std::string::npos) pos = fileName.rfind('\\');
+	if (pos != std::string::npos) fileName = fileName.substr(pos + 1, fileName.length());
+	model.m_tex_name = fileName.c_str();
+
 	return true;
 }
 

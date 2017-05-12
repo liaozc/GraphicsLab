@@ -16,7 +16,6 @@ struct DrawVert
 
 bool SmallExampleApp::init()
 {
-	initWorkDir();
 	m_example_id = 0;
 	
 	m_plain3d_shd = SHADER_NONE;
@@ -37,6 +36,8 @@ void SmallExampleApp::exit()
 
 bool SmallExampleApp::load()
 {
+	initWorkDir(renderer);
+
 	//exmaple 2 and 3
 	DrawVert quad[] = {
 		{vec3(-1,1,-1),vec4(0.5f,1,1,1)},
