@@ -14,6 +14,10 @@ bool FBXApp::init()
 	m_camera_dist = 100;
 	m_camera_pos = vec3(0, 0, m_camera_dist);
 	m_camera_angel = 0;
+
+	AllocConsole();
+	freopen("CONOUT$", "w+t", stdout);
+
 	return true;
 }
 
@@ -22,6 +26,8 @@ void FBXApp::exit()
 	delete m_model;
 	delete m_model_panel;
 	FBXSimpleManager::destory();
+
+	FreeConsole();
 }
 
 bool FBXApp::load()
@@ -30,7 +36,7 @@ bool FBXApp::load()
 
 	m_basic_shd = renderer->addShader(ShaderDir("/basic.shd"));
 	m_model = new FbxModel();
-	m_model->loadFbx(ResDir("/Models/Fbx/human2.fbx"),0.05f);
+	m_model->loadFbx(ResDir("/Models/Fbx/constructor.fbx"),0.05f);
 	m_model->makeDrawable(renderer, true, m_basic_shd);
 
 	m_model_panel = new FbxModel();

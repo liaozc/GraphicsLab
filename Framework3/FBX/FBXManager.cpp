@@ -193,6 +193,18 @@ bool FBXSimpleManager::loadElement_normal(fbxsdk::FbxMesh* mesh, FbxModel & mode
 
 bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, int uvIndex)
 {
+	{//print uv
+		printf("mesh : %d \n", (int)mesh);
+		int uvCount = mesh->GetElementUVCount();
+		printf("uvCount: %d \n",uvCount);
+		for (int i = 0; i < uvCount; ++i) {
+			fbxsdk::FbxGeometryElementUV* pUVs = mesh->GetElementUV(i);
+			fbxsdk::FbxLayerElement::EMappingMode mapMode = pUVs->GetMappingMode();
+			bool useIndex = pUVs->GetReferenceMode() != FbxGeometryElement::eDirect;
+			printf("mapMode: %d : count : %d \n", (int)mapMode, useIndex ? pUVs->GetIndexArray().GetCount(): pUVs->GetDirectArray().GetCount());	
+		}
+	}
+
 	fbxsdk::FbxGeometryElementUV* pUVs = nullptr;
 	pUVs = mesh->GetElementUV(uvIndex);
 	if (!pUVs) return false;
@@ -242,6 +254,49 @@ bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, 
 
 bool FBXSimpleManager::loadElement_material(fbxsdk::FbxMesh * mesh, FbxModel & model, int texIndex)
 {
+	{//print matriel
+		printf("mesh : %d \n", (int)mesh);
+		int matCount = mesh->GetNode()->GetSrcObjectCount<fbxsdk::FbxSurfaceMaterial>();
+		printf("  mat count : %d \n", matCount);
+		for (int i = 0; i < matCount; ++i) {
+			FbxSurfaceMaterial* pMat = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(i);
+			printf("    mat%d: \n", i);
+			int texTypeCount = fbxsdk::FbxLayerElement::eTextureDisplacementVector - fbxsdk::FbxLayerElement::eTextureDiffuse + 1;
+			for (int j = 0; j < texTypeCount; ++j) {
+				fbxsdk::FbxProperty prop = pMat->FindProperty(fbxsdk::FbxLayerElement::sTextureChannelNames[j]);
+				if (!prop.IsValid()) continue;
+				int texCount = prop.GetSrcObjectCount<fbxsdk::FbxTexture>();
+				printf("      texType%d:(%s)(%d) \n", j, fbxsdk::FbxLayerElement::sTextureChannelNames[j],texCount);
+				if (texCount == 0) continue;
+				for (int k = 0; k < texCount; ++k) {
+					printf("        tex%d:\n", k);
+					fbxsdk::FbxLayeredTexture *layerTex = prop.GetSrcObject<FbxLayeredTexture>(k);
+					if (layerTex) {
+						int ltexCount = layerTex->GetSrcObjectCount<fbxsdk::FbxTexture>();
+						for (int s = 0; s < ltexCount; ++s) {
+							FbxTexture* ltex = layerTex->GetSrcObject<fbxsdk::FbxTexture>(s);
+							if (ltex) {
+								FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex);
+								if (!lftex) return false;
+								printf("          layerTex->tex%d : %s \n", s, (char*)lftex->GetFileName());
+							}
+						}
+					}
+					else {
+						FbxTexture* ltex = prop.GetSrcObject<FbxTexture>(k);
+						if (ltex) {
+							FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex);
+							if (!lftex) return false;
+							printf("          Tex%d : %s \n", k, (char*)lftex->GetFileName());
+						}
+					
+					}
+				
+				}
+			}
+		}
+	}
+
 	//it is temp  implemented. it has many potential issues.
 	int matCount = mesh->GetNode()->GetSrcObjectCount<fbxsdk::FbxSurfaceMaterial>();
 	if (matCount == 0) return false;
