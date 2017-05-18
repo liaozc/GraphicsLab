@@ -36,7 +36,7 @@ bool FBXApp::load()
 
 	m_basic_shd = renderer->addShader(ShaderDir("/basic.shd"));
 	m_model = new FbxModel();
-	m_model->loadFbx(ResDir("/Models/Fbx/constructor.fbx"),0.05f);
+	m_model->loadFbx(ResDir("/Models/Fbx/human2_fbx6binary.fbx"));
 	m_model->makeDrawable(renderer, true, m_basic_shd);
 
 	m_model_panel = new FbxModel();
@@ -101,7 +101,10 @@ void FBXApp::drawFrame()
 	renderer->apply();
 */
 	renderer->setViewProj(worldViewProj);
-	//m_model_panel->draw(renderer);
+	m_model->setWorld(scale(0.1f, 0.1f, 0.1f));
 	m_model->draw(renderer);
+	m_model_panel->setWorld(rotateX(PI*0.5f));
+	m_model_panel->draw(renderer);
+	
 	
 }

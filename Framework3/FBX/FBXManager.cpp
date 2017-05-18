@@ -40,17 +40,18 @@ void FBXSimpleManager::destory()
 	m_instance = nullptr;
 }
 
-bool FBXSimpleManager::loadNode(fbxsdk::FbxNode * node, FbxModel & model, float scale)
+bool FBXSimpleManager::loadNode(fbxsdk::FbxNode * node, FbxModel & model)
 {
 	int attributeCount = node->GetNodeAttributeCount();
 	for (int i = 0; i < attributeCount; ++i) {
 		fbxsdk::FbxNodeAttribute* nodeAtt = node->GetNodeAttributeByIndex(i);
-		loadAttributes(nodeAtt, model, scale);
+		loadAttributes(nodeAtt, model);
 	}
 	//process children
 	for (int i = 0; i<node->GetChildCount(); i++) {
 		FbxModel* subModel = new FbxModel();
-		loadNode(node->GetChild(i), *subModel, scale);
+		loadNode(node->GetChild(i), *subModel);
+		subModel->m_parent = &model;
 		model.m_children.add(subModel);
 	}
 
@@ -58,14 +59,14 @@ bool FBXSimpleManager::loadNode(fbxsdk::FbxNode * node, FbxModel & model, float 
 }
 
 
-bool FBXSimpleManager::loadAttributes(fbxsdk::FbxNodeAttribute* nodeAtt, FbxModel & model,float scale)
+bool FBXSimpleManager::loadAttributes(fbxsdk::FbxNodeAttribute* nodeAtt, FbxModel & model)
 {
 	if (nodeAtt == NULL) return false;
 	switch (nodeAtt->GetAttributeType()) {
 	case fbxsdk::FbxNodeAttribute::eMarker:                  break;
 	case fbxsdk::FbxNodeAttribute::eSkeleton:                break;
 	case fbxsdk::FbxNodeAttribute::eMesh:
-		loadAttributes_mesh(nodeAtt,model, scale);
+		loadAttributes_mesh(nodeAtt,model);
 		break;
 	case fbxsdk::FbxNodeAttribute::eCamera:                  break;
 	case fbxsdk::FbxNodeAttribute::eLight:                   break;
@@ -89,7 +90,7 @@ bool FBXSimpleManager::loadAttributes(fbxsdk::FbxNodeAttribute* nodeAtt, FbxMode
 	return true;
 }
 
-bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, FbxModel & model, float scale)
+bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, FbxModel & model)
 {
 	fbxsdk::FbxMesh *mesh = static_cast<fbxsdk::FbxMesh*>(nodeAtt);
 	if (!mesh->IsTriangleMesh()){
@@ -97,54 +98,55 @@ bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, F
 		nodeAtt = converter.Triangulate(nodeAtt,true);
 		mesh = static_cast<fbxsdk::FbxMesh*>(nodeAtt);
 	}
+	//all tris
+	int indexCount = mesh->GetPolygonVertexCount(); //this is all the faces
+	int triCount = indexCount / 3;
+	model.m_tris.setCount(triCount);
 	//get vertex
 	int vertCount = mesh->GetControlPointsCount();
 	for (int i = 0; i < vertCount; ++i) {
 		fbxsdk::FbxVector4 pos = mesh->GetControlPointAt(i);
-		vec3 position = vec3((float)pos.mData[0], (float)pos.mData[1], (float)pos.mData[2]) * scale;
+		vec3 position = vec3((float)pos.mData[0], (float)pos.mData[1], (float)pos.mData[2]);
 		model.m_verts.add(position);
 	}
-	//get indices
-	int indexCount = mesh->GetPolygonVertexCount();
+	//set index
 	int* inds = mesh->GetPolygonVertices();
-	for (int i = 0; i < indexCount; ++i) {
-		ushort index = (ushort)inds[i];
-		model.m_inds.add(index);
+	for (int i = 0; i < triCount; ++i) {
+		ushort index0 = (ushort)inds[i * 3 + 0];
+		ushort index1 = (ushort)inds[i * 3 + 1];
+		ushort index2 = (ushort)inds[i * 3 + 2];
+		model.m_tris[i].posIndex0 = index0;
+		model.m_tris[i].posIndex1 = index1;
+		model.m_tris[i].posIndex2 = index2;
 	}
 	//elements
 	// -- normals
 		loadElement_normal(mesh, model);
 	// -- texcoord0
-		loadElement_uv(mesh, model, 0);
+		loadElement_uv(mesh, model);
 	//texture0
-		loadElement_material(mesh, model, 0);
+		loadElement_material(mesh, model);
 
-#if 0
+#if 1
 	//make the right-handeness coord to d3d
 	for (int i = 0; i < vertCount; ++i) {
-		vec3 X(1, 0, 0);
-		vec3 Y(0, 0, 1);
-		vec3 Z(0, 1, 0);
-		vec3 newPos;
-		newPos.x = dot(model.m_verts[i], X);
-		newPos.y = dot(model.m_verts[i], Y);
-		newPos.z = dot(model.m_verts[i], Z);
-		vec3 newNormal;
-		newNormal.x = dot(model.m_normals[i], X);
-		newNormal.y = dot(model.m_normals[i], Y);
-		newNormal.z = dot(model.m_normals[i], Z);
-		model.m_verts[i] = newPos;
-		model.m_normals[i] = newNormal;
+		model.m_verts[i].z = -model.m_verts[i].z;
 	}
-	for (int i = 0; i < indexCount; i += 3) {
-		ushort temp = model.m_inds[i];
-		model.m_inds[i] = model.m_inds[i + 2];
-		model.m_inds[i + 2] = temp;
-
-		temp = model.m_texcoodIndis[i];
-		model.m_texcoodIndis[i] = model.m_texcoodIndis[i + 2];
-		model.m_texcoodIndis[i + 2] = temp;
+	for (int i = 0; i < model.m_tris.getCount(); ++i) {
+		int temp = model.m_tris[i].posIndex0;
+		model.m_tris[i].posIndex0 = model.m_tris[i].posIndex2;
+		model.m_tris[i].posIndex2 = temp;
+		temp = model.m_tris[i].tex0Index0;
+		model.m_tris[i].tex0Index0 = model.m_tris[i].tex0Index2;
+		model.m_tris[i].tex0Index2 = temp;
+		temp = model.m_tris[i].normalIndex0;
+		model.m_tris[i].normalIndex0 = model.m_tris[i].normalIndex2;
+		model.m_tris[i].normalIndex2 = temp;
 	}
+	for (int i = 0; i < model.m_normals.getCount(); ++i) {
+		model.m_normals[i].z = -model.m_normals[i].z;
+	}
+		
 #endif
 	return false;
 }
@@ -152,17 +154,16 @@ bool FBXSimpleManager::loadAttributes_mesh(fbxsdk::FbxNodeAttribute * nodeAtt, F
 bool FBXSimpleManager::loadElement_normal(fbxsdk::FbxMesh* mesh, FbxModel & model)
 {
 	fbxsdk::FbxGeometryElementNormal* pNormals = nullptr;
-	pNormals = mesh->GetElementNormal();
+	pNormals = mesh->GetElementNormal(0);
 	if (!pNormals) return false;
 
-	model.m_normals.setCount(mesh->GetControlPointsCount());
-	memset(model.m_normals.getArray(), 0, sizeof(vec3) * mesh->GetControlPointsCount());
-	
 	fbxsdk::FbxLayerElement::EMappingMode mapMode = pNormals->GetMappingMode();
 	bool useIndex = pNormals->GetReferenceMode() != FbxGeometryElement::eDirect;
+
 	uint polyCount = mesh->GetPolygonCount();
 	
 	if (mapMode == fbxsdk::FbxLayerElement::eByControlPoint) {
+		model.m_normals.setCount(mesh->GetControlPointsCount());
 		for (uint i = 0; i < polyCount; ++i) {
 			const int polySize = mesh->GetPolygonSize(i);
 			for (int vi = 0; vi < polySize; ++vi){
@@ -170,28 +171,34 @@ bool FBXSimpleManager::loadElement_normal(fbxsdk::FbxMesh* mesh, FbxModel & mode
 				int nIndex = useIndex ? pNormals->GetIndexArray().GetAt(ci) : ci; //the UV index depends on the reference mode
 				FbxVector4 normal = pNormals->GetDirectArray().GetAt(nIndex);
 				model.m_normals[ci] = vec3((float)normal.mData[0], (float)normal.mData[1], (float)normal.mData[2]);
+				model.m_tris[i].normals[vi] = ci;
 			}
 		}
 	}
 	else if (mapMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
-		int polyIndexCounter = 0;
-		int uvCount = pNormals->GetDirectArray().GetCount();
-		for (uint i = 0; i < polyCount; i ++ )	{
-			const int polySize = mesh->GetPolygonSize(i);
-			for (int vi = 0; vi < polySize; vi ++) {
-				int nIndex = useIndex ? pNormals->GetIndexArray().GetAt(polyIndexCounter) : polyIndexCounter;
-				FbxVector4 normal = pNormals->GetDirectArray().GetAt(nIndex);
-				int ci = mesh->GetPolygonVertex(i, vi);
-				model.m_normals[ci] += vec3((float)normal.mData[0], (float)normal.mData[1], (float)normal.mData[2]);
-				polyIndexCounter++;
-			}
+		int normalCount = pNormals->GetDirectArray().GetCount();
+		model.m_normals.setCount(normalCount);
+		for (int i = 0; i < normalCount; ++i) {
+			FbxVector4 normal = pNormals->GetDirectArray().GetAt(i);
+			model.m_normals[i] = vec3((float)normal.mData[0], (float)normal.mData[1], (float)normal.mData[2]);
 		}
-	
+		for (uint i = 0; i < polyCount; i++) {
+			if (useIndex) {
+				model.m_tris[i].normalIndex0 = pNormals->GetIndexArray().GetAt(i * 3);
+				model.m_tris[i].normalIndex1 = pNormals->GetIndexArray().GetAt(i * 3 + 1);
+				model.m_tris[i].normalIndex2 = pNormals->GetIndexArray().GetAt(i * 3 + 2);
+			}
+			else {
+				model.m_tris[i].normalIndex0 = i * 3;
+				model.m_tris[i].normalIndex1 = i * 3 + 1;
+				model.m_tris[i].normalIndex2 = i * 3 + 2;
+			}
+		}	
 	}
 	return true;
 }
 
-bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, int uvIndex)
+bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model)
 {
 	{//print uv
 		printf("mesh : %d \n", (int)mesh);
@@ -205,54 +212,57 @@ bool FBXSimpleManager::loadElement_uv(fbxsdk::FbxMesh * mesh, FbxModel & model, 
 		}
 	}
 
-	fbxsdk::FbxGeometryElementUV* pUVs = nullptr;
-	pUVs = mesh->GetElementUV(uvIndex);
-	if (!pUVs) return false;
-	Array<vec2>* texCoords = uvIndex == 0 ? &model.m_texcoord0s : uvIndex == 1 ? &model.m_texcoord1s : nullptr;
-	if (!texCoords) return false;
-	texCoords->setCount(mesh->GetControlPointsCount());
-	memset(texCoords->getArray(), 0, sizeof(vec2) * mesh->GetControlPointsCount());
-
-	fbxsdk::FbxLayerElement::EMappingMode mapMode = pUVs->GetMappingMode();
-	bool useIndex = pUVs->GetReferenceMode() != FbxGeometryElement::eDirect;
-	uint polyCount = mesh->GetPolygonCount();
-
-	if (mapMode == fbxsdk::FbxLayerElement::eByControlPoint) {
-		for (uint i = 0; i < polyCount; ++i) {
-			const int polySize = mesh->GetPolygonSize(i);
-			for (int vi = 0; vi < polySize; ++vi) {
-				int ci = mesh->GetPolygonVertex(i, vi);//get the index of the current vertex in control points array
-				int uvIndex = useIndex ? pUVs->GetIndexArray().GetAt(ci) : ci; //the UV index depends on the reference mode
-				FbxVector2 uv = pUVs->GetDirectArray().GetAt(uvIndex);
-				(*texCoords)[ci] = vec2((float)uv.mData[0], (float)uv.mData[1]);
+	int uvCount = mesh->GetElementUVCount();
+	uvCount = min(2, uvCount);
+	uvCount = 1;//force for test
+	for (int i = 0; i < uvCount; ++i) {
+		fbxsdk::FbxGeometryElementUV* pUVs = nullptr;
+		pUVs = mesh->GetElementUV(i);
+		if (!pUVs) continue;
+		Array<vec2>* texCoords = i == 0 ? &model.m_texcoord0s : nullptr;
+		if (!texCoords) continue;
+		fbxsdk::FbxLayerElement::EMappingMode mapMode = pUVs->GetMappingMode();
+		bool useIndex = pUVs->GetReferenceMode() != FbxGeometryElement::eDirect;
+		uint polyCount = mesh->GetPolygonCount();
+		if (mapMode == fbxsdk::FbxLayerElement::eByControlPoint) {
+			texCoords->setCount(mesh->GetControlPointsCount());
+			for (uint i = 0; i < polyCount; ++i) {
+				const int polySize = mesh->GetPolygonSize(i);
+				for (int vi = 0; vi < polySize; ++vi) {
+					int ci = mesh->GetPolygonVertex(i, vi);	//get the index of the current vertex in control points array
+					int uvIndex = useIndex ? pUVs->GetIndexArray().GetAt(ci) : ci; //the UV index depends on the reference mode
+					FbxVector2 uv = pUVs->GetDirectArray().GetAt(uvIndex);
+					(*texCoords)[ci] = vec2((float)uv.mData[0], (float)uv.mData[1]);
+					model.m_tris[i].tex0Inds[vi] = ci;
+				}
+			}
+		}
+		else if (mapMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
+			int uvCount = pUVs->GetDirectArray().GetCount();
+			texCoords->setCount(uvCount);
+			for (int i = 0; i < uvCount; ++i) {
+				FbxVector2 uv = pUVs->GetDirectArray().GetAt(i);
+				(*texCoords)[i] = (vec2((float)uv.mData[0], (float)uv.mData[1]));
+			}
+			for (uint i = 0; i < polyCount; ++i) {
+				if (useIndex) {
+					model.m_tris[i].tex0Index0 = pUVs->GetIndexArray().GetAt(i * 3);
+					model.m_tris[i].tex0Index1 = pUVs->GetIndexArray().GetAt(i * 3 + 1);
+					model.m_tris[i].tex0Index2 = pUVs->GetIndexArray().GetAt(i * 3 + 2);
+				}
+				else {
+					model.m_tris[i].tex0Index0 = 3 * i;
+					model.m_tris[i].tex0Index1 = 3 * i + 1;
+					model.m_tris[i].tex0Index2 = 3 * i + 2;
+				}
 			}
 		}
 	}
-	else if (mapMode == fbxsdk::FbxLayerElement::eByPolygonVertex) {
-		if (useIndex) {
-			int indexCount = pUVs->GetIndexArray().GetCount();
-			model.m_texcoodIndis.setCount(indexCount);
-			for (int i = 0; i < indexCount; ++i)
-				model.m_texcoodIndis[i] = (pUVs->GetIndexArray().GetAt(i));
-		}
-		else {
-			int indexCount = mesh->GetPolygonVertexCount();
-			model.m_texcoodIndis.setCount(indexCount);
-			for (int i = 0; i < indexCount; ++i) {
-				model.m_texcoodIndis[i] = i;
-			}
-		}
-		texCoords->setCount(pUVs->GetDirectArray().GetCount());
-		int vertCount = pUVs->GetDirectArray().GetCount();
-		for (int i = 0; i < vertCount; ++i) {
-			FbxVector2 uv = pUVs->GetDirectArray().GetAt(i);
-			(*texCoords)[i] = (vec2((float)uv.mData[0], (float)uv.mData[1]));
-		}
-	}
+
 	return true;
 }
 
-bool FBXSimpleManager::loadElement_material(fbxsdk::FbxMesh * mesh, FbxModel & model, int texIndex)
+bool FBXSimpleManager::loadElement_material(fbxsdk::FbxMesh * mesh, FbxModel & model)
 {
 	{//print matriel
 		printf("mesh : %d \n", (int)mesh);
@@ -296,57 +306,76 @@ bool FBXSimpleManager::loadElement_material(fbxsdk::FbxMesh * mesh, FbxModel & m
 			}
 		}
 	}
-
+	
 	//it is temp  implemented. it has many potential issues.
 	int matCount = mesh->GetNode()->GetSrcObjectCount<fbxsdk::FbxSurfaceMaterial>();
 	if (matCount == 0) return false;
-	FbxSurfaceMaterial* pMat = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(0);
-	if (!pMat) return false;
-	fbxsdk::FbxProperty prop = pMat->FindProperty(FbxLayerElement::sTextureChannelNames[0]);
-	//get texture
-	int texCount = prop.GetSrcObjectCount<fbxsdk::FbxTexture>();
-	if (texCount == 0) return false;
-	char* textureName = nullptr;
-	fbxsdk::FbxLayeredTexture *layerTex = prop.GetSrcObject<FbxLayeredTexture>(0);
-	if (layerTex) {
-		int ltexCount = layerTex->GetSrcObjectCount<fbxsdk::FbxTexture>();
-		//for (int k = 0; k<ltexCount; ++k){
-			FbxTexture* ltex = layerTex->GetSrcObject<fbxsdk::FbxTexture>(0);
-			if (ltex){
+	model.m_mats.setCount(matCount);
+	for (int i = 0; i < matCount; ++i) {
+		model.m_mats[i].FbxMaterial::FbxMaterial();
+		fbxsdk::FbxSurfaceMaterial* pMat = mesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(i);
+		if (!pMat) continue;
+		fbxsdk::FbxProperty prop = pMat->FindProperty(FbxLayerElement::sTextureChannelNames[0]); // only use diffuse color tex currently.
+		if (!prop.IsValid()) continue;
+		int texCount = prop.GetSrcObjectCount<fbxsdk::FbxTexture>();
+		if (texCount != 1) continue; //only support use one image on one texture type.
+		fbxsdk::FbxLayeredTexture *layerTex = prop.GetSrcObject<FbxLayeredTexture>(0);
+		char* fileName = nullptr;
+		if (layerTex) {
+			int ltexCount = layerTex->GetSrcObjectCount<fbxsdk::FbxTexture>();
+			fbxsdk::FbxTexture* ltex = layerTex->GetSrcObject<fbxsdk::FbxTexture>(0);
+			if (ltex) {
+				FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex);
+				if (!lftex) continue;
+				fileName = (char*)lftex->GetFileName();
+			}
+		}
+		else {
+			fbxsdk::FbxTexture* ltex = prop.GetSrcObject<FbxTexture>(0);
+			if (ltex) {
 				FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex);
 				if (!lftex) return false;
-				textureName = (char*)lftex->GetFileName();
+				fileName = (char*)lftex->GetFileName();
 			}
-		//}
-	}
-	else {
-		FbxTexture* ltex = prop.GetSrcObject<FbxTexture>(0);
-		if (ltex) {
-			FbxFileTexture *lftex = FbxCast<FbxFileTexture>(ltex); 
-			if (!lftex) return false;
-			textureName = (char*)lftex->GetFileName();
+		}
+		if (fileName) {
+			std::string sFileName = fileName;
+			std::string::size_type pos = sFileName.rfind('/');
+			if (pos == std::string::npos) pos = sFileName.rfind('\\');
+			if (pos != std::string::npos) sFileName = sFileName.substr(pos + 1, sFileName.length());
+			//model.m_mats[i].m_texName.setLength(strlen(sFileName.c_str()) + 1);
+			model.m_mats[i].m_texName = sFileName.c_str();
 		}
 	}
-	if (!textureName)  return false;
-	std::string fileName = textureName;
-	std::string::size_type pos = fileName.rfind('/');
-	if (pos == std::string::npos) pos = fileName.rfind('\\');
-	if (pos != std::string::npos) fileName = fileName.substr(pos + 1, fileName.length());
-	model.m_tex_name = fileName.c_str();
 
+	//get tri material index
+	uint polyCount = mesh->GetPolygonCount();
+	fbxsdk::FbxLayerElementMaterial* pMat = mesh->GetElementMaterial(0);
+	fbxsdk::FbxLayerElement::EMappingMode mapMode = pMat->GetMappingMode();
+	for (int i = 0; i < polyCount; ++i) {
+		if (mapMode == fbxsdk::FbxLayerElement::eAllSame) {
+			model.m_tris[i].matIndex = pMat->GetIndexArray().GetAt(0);
+		}
+		else if (mapMode == fbxsdk::FbxLayerElement::eByPolygon) {
+			model.m_tris[i].matIndex = pMat->GetIndexArray().GetAt(i);
+		}
+	}
+	
 	return true;
 }
 
-bool FBXSimpleManager::load(const char * fileName, FbxModel & model,float scale) 
+bool FBXSimpleManager::load(const char * fileName, FbxModel & model) 
 {
-	FbxScene* scene = FbxScene::Create(m_fbxMgr, "");
+	fbxsdk::FbxScene* scene = fbxsdk::FbxScene::Create(m_fbxMgr, "");
 	FbxImporter* sceneImporter = FbxImporter::Create(m_fbxMgr, "");
 	sceneImporter->Initialize(fileName, -1, m_fbxMgr->GetIOSettings());
 	sceneImporter->Import(scene);
 	sceneImporter->Destroy();
 	//fill the model
+	//fbxsdk::FbxAxisSystem::DirectX;
+	fbxsdk::FbxAxisSystem coordSystem = scene->GetGlobalSettings().GetAxisSystem();
 	fbxsdk::FbxNode* rootNode = scene->GetRootNode();
-	loadNode(rootNode, model,scale);
+	loadNode(rootNode, model);
 	scene->Destroy(true);
 
 	return true;
