@@ -207,7 +207,7 @@ bool D3D10App::initAPI(const DXGI_FORMAT backBufferFmt, const DXGI_FORMAT depthB
 
 	DWORD deviceFlags = D3D10_CREATE_DEVICE_SINGLETHREADED;
 #ifdef _DEBUG
-  //  deviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+    deviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
 #endif
 
 #ifdef USE_D3D10_1

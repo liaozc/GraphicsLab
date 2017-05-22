@@ -78,25 +78,7 @@ bool App::init(){
 	// No framework created depth buffer
 	depthBits = 0;
 	
-	map = new Model();
-	if (!map->loadObj(ResDir("/Models/Map.hml"))) return false;
-	map->scale(0, float3(1, 1, -1));
-
-	uint nIndices = map->getIndexCount();
-	float3 *src = (float3 *) map->getStream(0).vertices;
-	uint *inds = map->getStream(0).indices;
-
-	for (uint i = 0; i < nIndices; i += 3){
-		float3 v0 = src[inds[i]];
-		float3 v1 = src[inds[i + 1]];
-		float3 v2 = src[inds[i + 2]];
-
-		bsp.addTriangle(v0, v1, v2);
-	}
-	bsp.build();
-
-	map->computeTangentSpace(true);
-
+	
 	sphere = new Model();
 	sphere->createSphere(3);
 
@@ -153,8 +135,28 @@ void App::exitAPI(){
 bool App::load(){
 
 	initWorkDir(renderer);
-	int sampleCount = max(antiAliasSamples, 1);
 
+	map = new Model();
+	if (!map->loadObj(ResDir("/Models/Map.hml"))) return false;
+	map->scale(0, float3(1, 1, -1));
+
+	uint nIndices = map->getIndexCount();
+	float3 *src = (float3 *)map->getStream(0).vertices;
+	uint *inds = map->getStream(0).indices;
+
+	for (uint i = 0; i < nIndices; i += 3) {
+		float3 v0 = src[inds[i]];
+		float3 v1 = src[inds[i + 1]];
+		float3 v2 = src[inds[i + 2]];
+
+		bsp.addTriangle(v0, v1, v2);
+	}
+	bsp.build();
+
+	map->computeTangentSpace(true);
+
+	int sampleCount = max(antiAliasSamples, 1);
+	
 	char def[256];
 	sprintf(def, "#define SAMPLE_COUNT %d\n", sampleCount);
 
@@ -173,9 +175,10 @@ bool App::load(){
 	// Main render targets
 	if ((baseRT      = renderer->addRenderTarget(width, height, 1, 1, 1, FORMAT_RGB10A2, sampleCount, SS_NONE)) == TEXTURE_NONE) return false;
 	if ((normalRT    = renderer->addRenderTarget(width, height, 1, 1, 1, FORMAT_RGBA8S,  sampleCount, SS_NONE)) == TEXTURE_NONE) return false;
-	if ((depthRT     = renderer->addRenderDepth (width, height, 1,       FORMAT_D16,     sampleCount, SS_NONE, SAMPLE_DEPTH)) == TEXTURE_NONE) return false;
-	if ((stencilMask = renderer->addRenderDepth (width, height, 1,       FORMAT_D24S8,   1,           SS_NONE)) == TEXTURE_NONE) return false;
-
+	if ((depthRT = renderer->addRenderDepth(width, height, 1, FORMAT_D16, sampleCount, SS_NONE, SAMPLE_DEPTH)) == TEXTURE_NONE) return false;
+	if ((stencilMask = renderer->addRenderDepth(width, height, 1, FORMAT_D24S8, 1, SS_NONE)) == TEXTURE_NONE) return false;
+	
+	
 	// Textures
 	if ((base[0] = renderer->addTexture  (ResDir("/Textures/Tx_wood_brown_shelf_small.dds"),                    true, trilinearAniso)) == TEXTURE_NONE) return false;
 	if ((bump[0] = renderer->addNormalMap(ResDir("/Textures/Tx_wood_brown_shelf_smallBump.dds"), FORMAT_RGBA8S, true, trilinearAniso)) == TEXTURE_NONE) return false;

@@ -815,7 +815,8 @@ TextureID Direct3D10Renderer::addRenderDepth(const int width, const int height, 
 	}
 	desc.Format = tex.texFormat;
 
-	if (FAILED(device->CreateTexture2D(&desc, NULL, (ID3D10Texture2D **) &tex.texture))){
+	HRESULT s_ret = device->CreateTexture2D(&desc, NULL, (ID3D10Texture2D **)&tex.texture);
+	if (FAILED(s_ret)){
 		ErrorMsg("Couldn't create depth target");
 		return TEXTURE_NONE;
 	}

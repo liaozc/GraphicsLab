@@ -1,0 +1,61 @@
+
+struct VsIn {
+	float4 position : POSITION;
+	float3 normal : NORMAL;
+	float2 texcoord : TEXCOORD;
+};
+
+struct PsIn {
+	float4 position : SV_POSITION;
+	float3 normal : NORMAL;
+	float2 texcoord : TEXCOORD0;
+	float3 fPos : TEXCOORD1;
+	float3 lightVec : TEXCOORD2;
+};
+
+[Vertex shader]
+
+float4x4 mvp;
+
+float3 camPos;
+float3 lightPos;
+
+PsIn main(VsIn In){
+	PsIn Out;
+	Out.position = mul(mvp,In.position);
+	Out.normal = In.normal;
+	Out.texcoord = In.texcoord;
+	Out.fPos = In.position - camPos;
+	Out.lightVec = lightPos - In.position;
+	return Out;
+}
+
+[Fragment shader]
+
+Texture2D texBase;
+SamplerState texFilter;
+float3 lPos;
+float3 lightColor;
+
+float3 main(PsIn In) :SV_Target {
+	float4 base = texBase.Sample(texFilter,In.texcoord);
+	float v1 = dot(In.fPos,In.fPos);
+	float v2 = dot(In.fPos,lPos);
+	float t = v2/v1;
+	float3 p = t * In.fPos - lPos;
+	float dotp = dot(p,p);
+	dotp = dotp * 0.0002 + 1.0;
+	p = 1.0/dotp;
+
+	float dotL = dot(In.lightVec,In.lightVec);
+	dotL = dotL * 0.0004 + 1;
+	dotL = 1.0/dotL;
+	
+	float diffuse = saturate(dot(In.lightVec,In.normal));
+	dotL = dotL * diffuse + 0.1;
+
+	float3 atten = base.xyz * dotL + p;
+
+	return atten * lightColor;
+
+}
