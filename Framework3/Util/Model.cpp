@@ -174,6 +174,48 @@ void Model::createCube(float size, bool withTexCoord)
 	
 }
 
+void Model::createPanel(vec2 size, bool withTexCoord)
+{
+	const int nVertices = 4;
+	float3 *vertices = new float3[nVertices];
+	float3 vLT = vec3(-size.x,0,size.y) * 0.5f;
+	float3 vRT = vec3(size.x, 0, size.y) * 0.5f;
+	float3 vRB = vec3(size.x, 0, -size.y) * 0.5f;
+	float3 vLB = vec3(-size.x, 0, -size.y) * 0.5f;
+	vertices[0] = vLT;
+	vertices[1] = vRT;
+	vertices[2] = vRB;
+	vertices[3] = vLB;
+
+	uint * indices = new uint[6];
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+	addStream(TYPE_VERTEX, 3, nVertices, (float *)vertices, indices, false);
+	nIndices = 6;
+	addBatch(0, nVertices);
+
+	if (withTexCoord) {
+		float2 *texCoords = new float2[nVertices];
+		texCoords[0] = float2(0, 0);
+		texCoords[1] = float2(1, 0);
+		texCoords[2] = float2(1, 1);
+		texCoords[3] = float2(0, 1);
+		uint * texIndices = new uint[6];
+		texIndices[0] = 0;
+		texIndices[1] = 1;
+		texIndices[2] = 2;
+		texIndices[3] = 0;
+		texIndices[4] = 2;
+		texIndices[5] = 3;
+		addStream(TYPE_TEXCOORD, 2, nVertices, (float *)texCoords, texIndices, true);
+	}
+
+}
+
 StreamID Model::findStream(const AttributeType type, const uint index) const {
 	uint count = 0;
 	for (uint i = 0; i < streams.getCount(); i++){
