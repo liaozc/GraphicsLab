@@ -29,6 +29,12 @@ bool CSMApp::init()
 	return true;
 }
 
+void CSMApp::exit()
+{
+	delete m_cube;
+	delete m_panel;
+}
+
 bool CSMApp::load()
 {
 	initWorkDir(renderer);

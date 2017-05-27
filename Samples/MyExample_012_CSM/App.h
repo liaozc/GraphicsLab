@@ -10,6 +10,7 @@ public:
 	char *getTitle() const { return "cascaded shadow maps scene"; }
 	void drawFrame();
 	bool init();
+	void exit();
 	bool load();
 protected:
 	ShaderID m_camera_shd;
