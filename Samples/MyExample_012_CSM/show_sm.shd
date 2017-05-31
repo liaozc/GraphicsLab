@@ -1,0 +1,33 @@
+
+struct VsIn {
+	float4 pos : Position;
+	float2 tex : Texcoord;
+};
+
+struct PsIn {
+	float4 pos : SV_Position;
+	float2 tex : TEXCOORD0;
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+
+PsIn main(VsIn In)
+{
+	PsIn Out;
+	Out.pos = mul(worldViewProj,In.pos);
+	Out.tex = In.tex;
+	return Out;
+}
+
+[Fragment shader]
+
+Texture2D shadowMap;
+SamplerState smFliter;
+
+float3 main(PsIn In):SV_Target
+{
+	float3 rgb = shadowMap.Sample(smFliter,In.tex).rgb;
+	return rgb;
+}

@@ -21,13 +21,18 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="CameraApp.cpp" />
+    <ClCompile Include="math_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="CameraApp.h" />
+    <ClInclude Include="math_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cameraTest.shd" />
+    <None Include="line.shd" />
+    <None Include="normal_shadow.shd" />
+    <None Include="show_sm.shd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9445B3B6-62E6-4002-9407-37CC8083CE8E}</ProjectGuid>

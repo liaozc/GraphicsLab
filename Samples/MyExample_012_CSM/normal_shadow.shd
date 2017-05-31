@@ -1,0 +1,31 @@
+
+struct VsIn {
+	float4 pos : Position;
+};
+
+struct PsIn {
+	float4 pos : SV_Position;
+};
+
+[Vertex shader]
+
+float4x4 worldViewProj;
+
+PsIn main(VsIn In)
+{
+	PsIn Out;
+	Out.pos = mul(worldViewProj,In.pos);
+	return Out;
+}
+
+[Fragment shader]
+
+float4 main(PsIn In):SV_Target
+{	
+	float4 rgba;
+	rgba.r = In.pos.z  ;
+	rgba.g = In.pos.z * In.pos.z;//In.pos.z * In.pos.z;
+	rgba.b = 0;
+	rgba.a = 1.0;
+	return rgba;
+}
