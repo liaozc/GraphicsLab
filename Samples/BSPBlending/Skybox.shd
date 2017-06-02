@@ -1,0 +1,37 @@
+
+struct PsIn
+{
+	float4 Position : SV_Position;
+	float3 TexCoord : TexCoord;
+};
+
+[Vertex shader]
+
+float4x4 InvMvp;
+
+PsIn main(uint VertexID : SV_VertexID)
+{
+	PsIn Out;
+
+	// Produce a fullscreen triangle
+	float4 position;
+	position.x = (VertexID == 0)? 3.0f : -1.0f;
+	position.y = (VertexID == 2)? 3.0f : -1.0f;
+	position.zw = 1.0f;
+
+	Out.Position = position;
+	Out.TexCoord = mul(InvMvp, position);
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+TextureCube Env;
+SamplerState Filter;
+
+float4 main(PsIn In) : SV_Target
+{
+	return Env.Sample(Filter, In.TexCoord);
+}

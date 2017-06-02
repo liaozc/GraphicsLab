@@ -1,0 +1,76 @@
+
+struct VsIn
+{
+	float4 Position : Position;
+	float3 TexCoord : TexCoord;
+	float3 Tangent  : Tangent;
+	float3 Binormal : Binormal;
+	float3 Normal   : Normal;
+};
+
+struct PsIn
+{
+	float4 Position : SV_Position;
+	float3 WorldPos : Position;
+	float3 TexCoord : TexCoord;
+	float3 Tangent  : Tangent;
+	float3 Binormal : Binormal;
+	float3 Normal   : Normal;
+};
+
+[Vertex shader]
+
+float4x4 ViewProj;
+float3 CamPos;
+
+PsIn main(VsIn In)
+{
+	PsIn Out;
+
+	Out.Position = mul(ViewProj, In.Position);
+	Out.WorldPos = In.Position.xyz;
+	Out.TexCoord = In.TexCoord;
+	Out.Tangent  = In.Tangent;
+	Out.Binormal = In.Binormal;
+	Out.Normal   = In.Normal;
+
+	return Out;
+}
+
+
+[Fragment shader]
+
+Texture2DArray Base, Bump;
+SamplerState Filter;
+
+float3 CamPos;
+float Opacity;
+
+static const float3 LightVec = normalize(float3(-1.83f, 0.6f, -1.2f));
+
+float4 main(PsIn In, in bool IsFrontFace : SV_IsFrontFace) : SV_Target
+{
+	float4 base = Base.Sample(Filter, In.TexCoord);
+	float3 bump = Bump.Sample(Filter, In.TexCoord).xyz;
+	bump.xy = bump.xy * 2.0f - 1.0f;
+
+	// Compute world-space normal
+	float3 normal = normalize(In.Tangent * bump.x + In.Binormal * bump.y + In.Normal * bump.z);
+
+	float specular_intensity = (1.0f - 0.9f * base.a);
+	float specular_power = 128.0f - base.a * 120.0f;
+	
+	base.a = lerp(base.a, 1.0f, Opacity);
+
+	float3 view_vec = normalize(CamPos - In.WorldPos);
+	float3 half_vec = normalize(LightVec + view_vec);
+
+	float diffuse0 = saturate(dot(LightVec, -normal));
+	float diffuse1 = saturate(dot(LightVec,  normal));
+	float diffuse = lerp(diffuse0, diffuse1, IsFrontFace? base.a : 1.0f - base.a);
+	float specular = specular_intensity * (IsFrontFace? diffuse1 : diffuse0) * pow(saturate(dot(half_vec, IsFrontFace? normal : -normal)), specular_power);
+
+	float3 light = (diffuse * 2.0f + 0.2f) * base.rgb * base.a + specular;
+
+	return float4(light, base.a);
+}

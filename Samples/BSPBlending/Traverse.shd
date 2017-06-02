@@ -1,0 +1,118 @@
+[Compute shader]
+
+// This mirrors the BSPNode struct on the CPU side
+struct BSPNode
+{
+	// Plane equation for this node
+	float3 Normal;
+	float D;
+
+	// Instead of storing back and front node pointers, we only need to store the total number of nodes in the back sub-tree.
+	// The location of back and front sub-trees are implicit. Back-tree (if there is one) is always at the next node, so
+	// simply +1 gets you there. To get to front tree you add the provided number of nodes in the back tree.
+	uint BackNodeCount;
+};
+
+StructuredBuffer<BSPNode> nodes : register(t0);
+RWBuffer<uint2> quads : register(u0);
+
+float3 CamPos;
+uint MaxNode;
+
+[numthreads(64, 1, 1)]
+void main(uint3 threadID : SV_DispatchThreadID)
+{
+	// For the extra few threads we always have, it's best to just quit.
+	// An alternative approach is to clamp visibility_index below, but benchmark suggests this is slower.
+	// Initially I didn't do anything. That apparently doesn't hang, but I don't know if that's a
+	// guaranteed property or we were just lucky. Either way, that's the slowest option.
+	if (threadID.x > MaxNode)
+		return;
+
+	// Parallel traversal of the BSP tree. Each thread looks for the node at its index in the visibility order (back to front),
+	// i.e. thread 5 looks for the fifth backmost polygon and writes its indices to the index buffer at that position.
+	// For instance, if we're in front of the root node's plane, then the visibility order will be back-root-front,
+	// and if back tree has let's say 5 items, we know root is at index 5, the back tree at 0-4, and front tree 6 and above.
+	// So if we're thread 5 we're done, and any thread less than 5 will go down the back tree, and above 5 goes down front tree.
+	// Reduce visibility order range to our given sub-tree, and repeat, until we find the node at our index.
+	uint visibility_index = threadID.x;
+
+	// Root node is at 0
+	uint curr = 0;
+
+	// Visibility order range for current subtree
+	uint first = 0;
+	uint last = MaxNode;
+
+	while (true)
+	{
+		BSPNode node = nodes[curr];
+
+#if 1
+		// Faster but perhaps harder to understand
+
+		bool front = (dot(CamPos, node.Normal) >= -node.D);
+
+		uint curr_node_position = front? first + node.BackNodeCount : last - node.BackNodeCount;
+		if (visibility_index == curr_node_position)
+			break;
+
+		bool before = (visibility_index < curr_node_position);
+		if (before)
+			last = curr_node_position - 1;
+		else
+			first = curr_node_position + 1;
+
+		curr++; // Move pointer to back tree, which is always next item
+		if (front != before)
+			curr += node.BackNodeCount; // Move pointer to front tree by skipping all nodes in back tree
+
+#else
+		// Slower but maybe easier to understand what's going on
+
+		float d = dot(CamPos, node.Normal) + node.D;
+
+		if (d >= 0)
+		{
+			uint curr_node_position = first + node.BackNodeCount;
+			if (visibility_index == curr_node_position)
+				break;
+
+			if (visibility_index < curr_node_position)
+			{
+				curr++; // Move pointer to back tree, which is always next item
+				last = curr_node_position - 1;
+			}
+			else
+			{
+				curr = curr + node.BackNodeCount + 1; // Move pointer to front tree by skipping all nodes in back tree
+				first = curr_node_position + 1;
+			}
+		}
+		else
+		{
+			uint curr_node_position = last - node.BackNodeCount;
+			if (visibility_index == curr_node_position)
+				break;
+
+			if (visibility_index < curr_node_position)
+			{
+				curr = curr + node.BackNodeCount + 1; // Move pointer to front tree by skipping all nodes in back tree
+				last = curr_node_position - 1;
+			}
+			else
+			{
+				curr++; // Move pointer to back tree, which is always next item
+				first = curr_node_position + 1;
+			}
+		}
+#endif
+	}
+
+	// We only support quads in this demo, so dump out the 6 indices for this quad.
+	uint index = curr * 4;
+	quads[3 * threadID.x + 0] = uint2(index + 0, index + 1);
+	quads[3 * threadID.x + 1] = uint2(index + 2, index + 0);
+	quads[3 * threadID.x + 2] = uint2(index + 2, index + 3);
+
+}
