@@ -36,32 +36,32 @@ PsOut main(PsIn In){
 	int3 texCoord = int3(int2(In.position.xy), 0);
 
 	// Sample current state
-	float4 pos = pos.Load(texCoord);
-	float4 dir = dir.Load(texCoord);
+	float4 pos4 = pos.Load(texCoord);
+	float4 dir4 = dir.Load(texCoord);
 
-	pos.w += frameTime;
+	pos4.w += frameTime;
 
-	if (pos.w >= 4.0){
+	if (pos4.w >= 4.0){
 		// Restart animation
-		dir.xyz = sprinkleDir;
-		pos.xyz = float3(0, -235, 0);
-		pos.w -= 4.0;
+		dir4.xyz = sprinkleDir;
+		pos4.xyz = float3(0, -235, 0);
+		pos4.w -= 4.0;
 	} else {
 		// Gravity
-		dir.y -= 500.0 * frameTime;
+		dir4.y -= 500.0 * frameTime;
 
 		// Update position
-		pos.xyz += frameTime * dir;
+		pos4.xyz += frameTime * dir4;
 
 		// Make the particles bounce on walls, floor and ceiling
-		dir.xyz = ( pos > box)? -0.8 * abs(dir.xyz) : dir.xyz;
-		dir.xyz = (-pos > box)?  0.8 * abs(dir.xyz) : dir.xyz;
+		dir4.xyz = ( pos4 > box)? -0.8 * abs(dir4.xyz) : dir4.xyz;
+		dir4.xyz = (-pos4 > box)?  0.8 * abs(dir4.xyz) : dir4.xyz;
 
-		pos.xyz = clamp(pos.xyz, -box, box);
+		pos4.xyz = clamp(pos4.xyz, -box, box);
 	}
 
-	Out.pos = pos;
-	Out.dir = dir;
+	Out.pos = pos4;
+	Out.dir = dir4;
 
 	return Out;
 }

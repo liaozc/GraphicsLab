@@ -41,6 +41,7 @@ float2 zw;
 	Compute the bounds of the light. Returns false if the light is outside of view.
 */
 bool getScreenBox(const float3 pos, const float radius, out float lp, out float rp, out float tp, out float bp, out float zn, out float zf){
+	lp = rp = tp = bp = zn = zf = 0;
 	float4 lightPos = mul(modelview, float4(pos, 1.0));
 
 	// Compute z-bounds. Simplified code assuming standard projection matrix.
@@ -151,6 +152,8 @@ void main(point GsIn In[1], inout TriangleStream<PsIn> Stream){
 		Out.position.xy = float2(x1, y1) * 2.0 - 1.0;
 		Out.texCoord = Out.position.xy * float2(0.5, -0.5) + 0.5;
 		Stream.Append(Out);
+
+		Stream.RestartStrip();
 	}
 }
 
@@ -165,16 +168,16 @@ float4x4 invMvp;
 //float3 camPos;
 
 float3 main(PsIn In) : SV_Target {
-	float depth = depth.Sample(filter, In.texCoord).x;
+	float d = depth.Sample(filter, In.texCoord).x;
 
 	// Only do lighting if depth is within the z-bounds of the light
 	[branch]
-	if (depth >= In.zBounds.x && depth <= In.zBounds.y){
-		float3 base = base.Sample(filter, In.texCoord).rgb;
-		float3 normal = normal.Sample(filter, In.texCoord).rgb * 2.0 - 1.0;
+	if (d >= In.zBounds.x && d <= In.zBounds.y){
+		float3 b = base.Sample(filter, In.texCoord).rgb;
+		float3 n = normal.Sample(filter, In.texCoord).rgb * 2.0 - 1.0;
 
 		// Clip-space position, except x and y scale-biased (the invMvp has this prebaked into it)
-		float4 cPos = float4(In.texCoord, depth, 1);
+		float4 cPos = float4(In.texCoord, d, 1);
 
 		// World-space position
 		float4 wPos = mul(invMvp, cPos);
@@ -185,13 +188,13 @@ float3 main(PsIn In) : SV_Target {
 		float3 lightVec = normalize(lVec);
 
 		float atten = saturate(1.0 - dot(lVec, lVec));
-		float diffuse = saturate(dot(lightVec, normal));
+		float diffuse = saturate(dot(lightVec, n));
 
 		//float3 viewVec = normalize(camPos - pos);
-		//float specular = pow(saturate(dot(reflect(-viewVec, normal), lightVec)), 12.0);
+		//float specular = pow(saturate(dot(reflect(-viewVec, n), lightVec)), 12.0);
 
-		return 0.7 * atten * In.color * (diffuse * base);
-		//return atten * In.color * (diffuse * base + specular);
+		return 0.7 * atten * In.color * (diffuse * b);
+		//return atten * In.color * (diffuse * b + specular);
 	} else {
 		return 0;
 	}

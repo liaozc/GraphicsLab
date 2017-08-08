@@ -13,6 +13,11 @@ void EmptyApp::drawFrame()
 
 bool EmptyApp::init()
 {
+	return true;
+}
+
+bool EmptyApp::load()
+{
 	initWorkDir(renderer);
 	return true;
 }

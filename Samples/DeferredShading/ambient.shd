@@ -34,12 +34,12 @@ float4x4 invMvp;
 
 float3 main(PsIn In) : SV_Target {
 	// Sample textures
-	float depth = depth.Sample(filter, In.texCoord).x;
-	float3 base = base.Sample(filter, In.texCoord).rgb;
-	float3 normal = normal.Sample(filter, In.texCoord).rgb * 2.0 - 1.0;
+	float d = depth.Sample(filter, In.texCoord).x;
+	float3 b = base.Sample(filter, In.texCoord).rgb;
+	float3 n = normal.Sample(filter, In.texCoord).rgb * 2.0 - 1.0;
 
 	// Clip-space position, except x and y scale-biased (the invMvp has this prebaked into it)
-	float4 cPos = float4(In.texCoord, depth, 1);
+	float4 cPos = float4(In.texCoord, d, 1);
 
 	// World-space position
 	float4 wPos = mul(invMvp, cPos);
@@ -50,11 +50,11 @@ float3 main(PsIn In) : SV_Target {
 	float3 lightVec = normalize(lVec);
 
 	float atten = 1.0 / (1.0 + 0.008 * length(lVec));
-	float diffuse = saturate(dot(lightVec, normal));
+	float diffuse = saturate(dot(lightVec, n));
 
 	//float3 viewVec = normalize(camPos - pos);
-	//float specular = pow(saturate(dot(reflect(-viewVec, normal), lightVec)), 12.0);
+	//float specular = pow(saturate(dot(reflect(-viewVec, n), lightVec)), 12.0);
 
-	return atten * diffuse * base;
-//	return atten * (diffuse * base + 0.7 * specular);
+	return atten * diffuse * b;
+//	return atten * (diffuse * b + 0.7 * specular);
 }
