@@ -6,20 +6,55 @@ struct GsIn
 
 struct PsIn
 {
-	float4 position: SV_POSITION;
+	float4 position: SV_Position;
 };
 
 [Vertex shader]
 
-PsIn main(uint VertexID: SV_VertexID)
+float randomAry[6];
+
+GsIn main(uint VertexID: SV_VertexID)
 {
-	PsIn Out;//GsIn Out;
+	GsIn Out = (GsIn)0;
 	float4 position;
-	position.x = (VertexID == 2)?  3.0 : -1.0;
-	position.y = (VertexID == 0)? -3.0 :  1.0;
+//	position.x = (VertexID == 2)?  3.0 : -1.0;
+//	position.y = (VertexID == 0)? -3.0 :  1.0;
+	int index = VertexID;
+	position.x = randomAry[4];//index * 0.25 - 1;
+	position.y = 0;
 	position.zw = 1.0;
 	Out.position = position;
 	return Out;
+}
+
+[Geometry shader]
+
+[maxvertexcount(6)]
+void main(point GsIn gIn[1],inout TriangleStream<PsIn> stream)
+{
+	PsIn Out = (PsIn)0;
+	Out.position = gIn[0].position;
+	Out.position.x = gIn[0].position.x - 0.1;
+	Out.position.y = gIn[0].position.y - 0.1;
+	stream.Append(Out);
+	Out.position.x = gIn[0].position.x - 0.1;
+	Out.position.y = gIn[0].position.y + 0.1;
+	stream.Append(Out);
+	Out.position.x = gIn[0].position.x + 0.1;
+	Out.position.y = gIn[0].position.y + 0.1;
+	stream.Append(Out);
+	stream.RestartStrip();
+	Out.position.x = gIn[0].position.x - 0.1;
+	Out.position.y = gIn[0].position.y - 0.1;
+	stream.Append(Out);
+	Out.position.x = gIn[0].position.x + 0.1;
+	Out.position.y = gIn[0].position.y + 0.1;
+	stream.Append(Out);
+	Out.position.x = gIn[0].position.x + 0.1;
+	Out.position.y = gIn[0].position.y - 0.1;
+	stream.Append(Out);
+	stream.RestartStrip();
+
 }
 
 

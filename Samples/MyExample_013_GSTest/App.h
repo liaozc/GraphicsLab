@@ -12,6 +12,7 @@ public:
 	virtual bool load();
 protected:
 	ShaderID gs_shd;
+
 };
 
 
